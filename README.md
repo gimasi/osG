@@ -2,4 +2,4 @@
 
 # Documentation
 
-* [Doxygen API reference](http://gimasi.github.com/osG)
+* [Doxygen API reference](http://gimasi.github.io/osG)
