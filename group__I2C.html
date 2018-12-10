@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>OSG: I2C</title>
+<title>osG: I2C</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">OSG
+   <div id="projectname">osG
    &#160;<span id="projectnumber">0.1.0</span>
    </div>
   </td>
@@ -61,6 +61,7 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Data Structures</a> &#124;
+<a href="#typedef-members">Typedefs</a> &#124;
 <a href="#enum-members">Enumerations</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
@@ -82,12 +83,24 @@ Data Structures</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structosg__I2c.html">osg_I2c</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The I2C class.  <a href="structosg__I2c.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structosg__I2cImpl.html">osg_I2cImpl</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">I2c internal struct.  <a href="structosg__I2cImpl.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
+Typedefs</h2></td></tr>
+<tr class="memitem:ga7f051fc91fdfd4397428b1dcfa240786"><td class="memItemLeft" align="right" valign="top">typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__I2C.html#ga7f051fc91fdfd4397428b1dcfa240786">osg_I2c::osg_I2cCallback</a>) (void)</td></tr>
+<tr class="memdesc:ga7f051fc91fdfd4397428b1dcfa240786"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience type for I2C callback.  <a href="#ga7f051fc91fdfd4397428b1dcfa240786">More...</a><br /></td></tr>
+<tr class="separator:ga7f051fc91fdfd4397428b1dcfa240786"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 Enumerations</h2></td></tr>
 <tr class="memitem:gac5b6ef3c6fe57cd824762c8db2c6585f"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__I2C.html#gac5b6ef3c6fe57cd824762c8db2c6585f">osg_I2c::osg_I2cAddressingMode</a> <tr class="memdesc:gac5b6ef3c6fe57cd824762c8db2c6585f"><td class="mdescLeft">&#160;</td><td class="mdescRight">The possible I2C addressing mode.  <a href="group__I2C.html#gac5b6ef3c6fe57cd824762c8db2c6585f">More...</a><br /></td></tr>
 </td></tr>
 <tr class="separator:gac5b6ef3c6fe57cd824762c8db2c6585f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga3088ff05f5b6597f5bd3331406c2bad7"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__I2C.html#ga3088ff05f5b6597f5bd3331406c2bad7">osg_I2c::osg_I2cFlags</a> <tr class="memdesc:ga3088ff05f5b6597f5bd3331406c2bad7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enum used to represent I2C internal bit flags.  <a href="group__I2C.html#ga3088ff05f5b6597f5bd3331406c2bad7">More...</a><br /></td></tr>
+</td></tr>
+<tr class="separator:ga3088ff05f5b6597f5bd3331406c2bad7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gac07ece9b6ed964549731491d17e341ed"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__I2C.html#gac07ece9b6ed964549731491d17e341ed">osg_I2c::osg_I2cId</a> <tr class="memdesc:gac07ece9b6ed964549731491d17e341ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">The possible I2C IDs.  <a href="group__I2C.html#gac07ece9b6ed964549731491d17e341ed">More...</a><br /></td></tr>
 </td></tr>
 <tr class="separator:gac07ece9b6ed964549731491d17e341ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -97,33 +110,65 @@ Enumerations</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ga6a31b6d87ba2d7ec5b462478c836c496"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__I2C.html#ga6a31b6d87ba2d7ec5b462478c836c496">osg_I2c::osg_I2c_abortNonBlockingCommunication</a> (<a class="el" href="structosg__I2c.html">osg_I2c</a> *self, uint16_t slaveAddress)</td></tr>
-<tr class="memdesc:ga6a31b6d87ba2d7ec5b462478c836c496"><td class="mdescLeft">&#160;</td><td class="mdescRight">Abort an I2C communication.  <a href="#ga6a31b6d87ba2d7ec5b462478c836c496">More...</a><br /></td></tr>
-<tr class="separator:ga6a31b6d87ba2d7ec5b462478c836c496"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga3c4136ab064e3d152ad319ad0c5d529d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__I2C.html#ga3c4136ab064e3d152ad319ad0c5d529d">osg_I2c::osg_I2c_ctor</a> (<a class="el" href="structosg__I2c.html">osg_I2c</a> *self, const <a class="el" href="group__I2C.html#gac07ece9b6ed964549731491d17e341ed">osg_I2cId</a> id, const <a class="el" href="group__I2C.html#gacf2958c6341a2d861647b29c34c0e83c">osg_I2cMode</a> mode, const uint32_t clockSpeed, const <a class="el" href="group__I2C.html#gac5b6ef3c6fe57cd824762c8db2c6585f">osg_I2cAddressingMode</a> addressingMode, const <a class="el" href="group__Base.html#ga39db6982619d623273fad8a383489309">Bool</a> enableGeneralCall, const uint16_t ownAddress, const osg_GpioId sdaPin, const osg_GpioId sclPin)</td></tr>
-<tr class="memdesc:ga3c4136ab064e3d152ad319ad0c5d529d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="#ga3c4136ab064e3d152ad319ad0c5d529d">More...</a><br /></td></tr>
-<tr class="separator:ga3c4136ab064e3d152ad319ad0c5d529d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga7d74f062eac7d2782d7ab16e49518bb6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__I2C.html#ga7d74f062eac7d2782d7ab16e49518bb6">osg_I2c::osg_I2c_ctor</a> (<a class="el" href="structosg__I2c.html">osg_I2c</a> *self, const <a class="el" href="group__I2C.html#gac07ece9b6ed964549731491d17e341ed">osg_I2cId</a> id, const <a class="el" href="group__I2C.html#gacf2958c6341a2d861647b29c34c0e83c">osg_I2cMode</a> mode, const uint32_t clockSpeed, const <a class="el" href="group__I2C.html#gac5b6ef3c6fe57cd824762c8db2c6585f">osg_I2cAddressingMode</a> addressingMode, const <a class="el" href="group__Base.html#ga39db6982619d623273fad8a383489309">Bool</a> enableGeneralCall, const uint16_t ownAddress, void *circularTxBuffer, <a class="el" href="group__Base.html#gaf9ecec2d692138fab9167164a457cbd4">Size</a> txBufferSize, void *circularRxBuffer, <a class="el" href="group__Base.html#gaf9ecec2d692138fab9167164a457cbd4">Size</a> rxBufferSize, const osg_GpioId sdaPin, const osg_GpioId sclPin)</td></tr>
+<tr class="memdesc:ga7d74f062eac7d2782d7ab16e49518bb6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="#ga7d74f062eac7d2782d7ab16e49518bb6">More...</a><br /></td></tr>
+<tr class="separator:ga7d74f062eac7d2782d7ab16e49518bb6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga22cc332db7ddfdaa4be1237f515f9855"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__I2C.html#ga22cc332db7ddfdaa4be1237f515f9855">osg_I2c::osg_I2c_dtor</a> (<a class="el" href="structosg__I2c.html">osg_I2c</a> *self)</td></tr>
 <tr class="memdesc:ga22cc332db7ddfdaa4be1237f515f9855"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor.  <a href="#ga22cc332db7ddfdaa4be1237f515f9855">More...</a><br /></td></tr>
 <tr class="separator:ga22cc332db7ddfdaa4be1237f515f9855"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga5b2b009a150ae3b16aec073f81eea4dd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__Base.html#ga39db6982619d623273fad8a383489309">Bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__I2C.html#ga5b2b009a150ae3b16aec073f81eea4dd">osg_I2c::osg_I2c_receiveBlocking</a> (<a class="el" href="structosg__I2c.html">osg_I2c</a> *self, const uint16_t slaveAddress, const void *buffer, const size_t size, const uint32_t timeout)</td></tr>
-<tr class="memdesc:ga5b2b009a150ae3b16aec073f81eea4dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs a receive in blocking mode.  <a href="#ga5b2b009a150ae3b16aec073f81eea4dd">More...</a><br /></td></tr>
-<tr class="separator:ga5b2b009a150ae3b16aec073f81eea4dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaa66f31f1745740932945871bcac49f33"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__Base.html#ga39db6982619d623273fad8a383489309">Bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__I2C.html#gaa66f31f1745740932945871bcac49f33">osg_I2c::osg_I2c_receiveNonBlocking</a> (<a class="el" href="structosg__I2c.html">osg_I2c</a> *self, const uint16_t slaveAddress, const void *buffer, const size_t size)</td></tr>
-<tr class="memdesc:gaa66f31f1745740932945871bcac49f33"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs a receive in nonblocking mode.  <a href="#gaa66f31f1745740932945871bcac49f33">More...</a><br /></td></tr>
-<tr class="separator:gaa66f31f1745740932945871bcac49f33"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gacf2fe2657c415721c6a5dc2119b8ba46"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__I2C.html#gacf2fe2657c415721c6a5dc2119b8ba46">osg_I2c::osg_I2c_registerNonBlockingCallbacks</a> (<a class="el" href="structosg__I2c.html">osg_I2c</a> *self, osg_I2CCallback txCompletedCallback, osg_I2CCallback rxCompletedCallback, osg_I2CCallback errorCallback)</td></tr>
-<tr class="memdesc:gacf2fe2657c415721c6a5dc2119b8ba46"><td class="mdescLeft">&#160;</td><td class="mdescRight">Register user's callbacks for non-blocking communications.  <a href="#gacf2fe2657c415721c6a5dc2119b8ba46">More...</a><br /></td></tr>
-<tr class="separator:gacf2fe2657c415721c6a5dc2119b8ba46"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga0c6d892cf84f9bfd21ee1437fc636ee2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__Base.html#ga39db6982619d623273fad8a383489309">Bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__I2C.html#ga0c6d892cf84f9bfd21ee1437fc636ee2">osg_I2c::osg_I2c_sendBlocking</a> (<a class="el" href="structosg__I2c.html">osg_I2c</a> *self, const uint16_t slaveAddress, const void *buffer, const size_t size, const uint32_t timeout)</td></tr>
-<tr class="memdesc:ga0c6d892cf84f9bfd21ee1437fc636ee2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs a send in blocking mode.  <a href="#ga0c6d892cf84f9bfd21ee1437fc636ee2">More...</a><br /></td></tr>
-<tr class="separator:ga0c6d892cf84f9bfd21ee1437fc636ee2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga64a0d763e0b506ff1e9018d4519ea303"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__Base.html#ga39db6982619d623273fad8a383489309">Bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__I2C.html#ga64a0d763e0b506ff1e9018d4519ea303">osg_I2c::osg_I2c_sendNonBlocking</a> (<a class="el" href="structosg__I2c.html">osg_I2c</a> *self, const uint16_t slaveAddress, const void *buffer, const size_t size)</td></tr>
-<tr class="memdesc:ga64a0d763e0b506ff1e9018d4519ea303"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs a send in non-blocking mode.  <a href="#ga64a0d763e0b506ff1e9018d4519ea303">More...</a><br /></td></tr>
-<tr class="separator:ga64a0d763e0b506ff1e9018d4519ea303"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gacb7c99b3e1f80c1a31518ecbd6d630a7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__Base.html#ga39db6982619d623273fad8a383489309">Bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__I2C.html#gacb7c99b3e1f80c1a31518ecbd6d630a7">osg_I2c::osg_I2c_isReceiveBufferedEnabled</a> (<a class="el" href="structosg__I2c.html">osg_I2c</a> *self)</td></tr>
+<tr class="memdesc:gacb7c99b3e1f80c1a31518ecbd6d630a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Use this method to know whether the buffer is enabled.  <a href="#gacb7c99b3e1f80c1a31518ecbd6d630a7">More...</a><br /></td></tr>
+<tr class="separator:gacb7c99b3e1f80c1a31518ecbd6d630a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gab4b6e47d74d7d3fc0aa8caf284926772"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__Base.html#ga39db6982619d623273fad8a383489309">Bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__I2C.html#gab4b6e47d74d7d3fc0aa8caf284926772">osg_I2c::osg_I2c_receiveBlocking</a> (<a class="el" href="structosg__I2c.html">osg_I2c</a> *self, const uint16_t slaveAddress, void *buffer, const <a class="el" href="group__Base.html#gaf9ecec2d692138fab9167164a457cbd4">Size</a> size, const uint32_t timeout)</td></tr>
+<tr class="memdesc:gab4b6e47d74d7d3fc0aa8caf284926772"><td class="mdescLeft">&#160;</td><td class="mdescRight">Receive an amount of bytes in blocking mode.  <a href="#gab4b6e47d74d7d3fc0aa8caf284926772">More...</a><br /></td></tr>
+<tr class="separator:gab4b6e47d74d7d3fc0aa8caf284926772"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga15a4c6d1eaa4507b42f1d9f018f09259"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__Base.html#gaf9ecec2d692138fab9167164a457cbd4">Size</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__I2C.html#ga15a4c6d1eaa4507b42f1d9f018f09259">osg_I2c::osg_I2c_receiveBuffered</a> (<a class="el" href="structosg__I2c.html">osg_I2c</a> *self, const uint16_t slaveAddress, void *buffer, const <a class="el" href="group__Base.html#gaf9ecec2d692138fab9167164a457cbd4">Size</a> bufferSize)</td></tr>
+<tr class="memdesc:ga15a4c6d1eaa4507b42f1d9f018f09259"><td class="mdescLeft">&#160;</td><td class="mdescRight">Use this method to get the data received through UART in circular-buffered mode.  <a href="#ga15a4c6d1eaa4507b42f1d9f018f09259">More...</a><br /></td></tr>
+<tr class="separator:ga15a4c6d1eaa4507b42f1d9f018f09259"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae25a2b9d0e18dc20f65c7dc34b271efa"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__Base.html#ga39db6982619d623273fad8a383489309">Bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__I2C.html#gae25a2b9d0e18dc20f65c7dc34b271efa">osg_I2c::osg_I2c_receiveNonBlocking</a> (<a class="el" href="structosg__I2c.html">osg_I2c</a> *self, const uint16_t slaveAddress, void *buffer, const <a class="el" href="group__Base.html#gaf9ecec2d692138fab9167164a457cbd4">Size</a> size)</td></tr>
+<tr class="memdesc:gae25a2b9d0e18dc20f65c7dc34b271efa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Receive an amount of data in non-blocking mode.  <a href="#gae25a2b9d0e18dc20f65c7dc34b271efa">More...</a><br /></td></tr>
+<tr class="separator:gae25a2b9d0e18dc20f65c7dc34b271efa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga16d3394cf179ba49ac0d18a4bfc513bf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__Base.html#ga39db6982619d623273fad8a383489309">Bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__I2C.html#ga16d3394cf179ba49ac0d18a4bfc513bf">osg_I2c::osg_I2c_sendBlocking</a> (<a class="el" href="structosg__I2c.html">osg_I2c</a> *self, const uint16_t slaveAddress, void *buffer, const <a class="el" href="group__Base.html#gaf9ecec2d692138fab9167164a457cbd4">Size</a> size, const uint32_t timeout)</td></tr>
+<tr class="memdesc:ga16d3394cf179ba49ac0d18a4bfc513bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs a send in blocking mode.  <a href="#ga16d3394cf179ba49ac0d18a4bfc513bf">More...</a><br /></td></tr>
+<tr class="separator:ga16d3394cf179ba49ac0d18a4bfc513bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga093076a9f9d263d486c480adca344fa5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__Base.html#ga39db6982619d623273fad8a383489309">Bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__I2C.html#ga093076a9f9d263d486c480adca344fa5">osg_I2c::osg_I2c_sendBuffered</a> (<a class="el" href="structosg__I2c.html">osg_I2c</a> *self, const uint16_t slaveAddress, const void *buffer, const <a class="el" href="group__Base.html#gaf9ecec2d692138fab9167164a457cbd4">Size</a> bufferSize)</td></tr>
+<tr class="memdesc:ga093076a9f9d263d486c480adca344fa5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Use this method to send an amount of data through UART in buffered mode.  <a href="#ga093076a9f9d263d486c480adca344fa5">More...</a><br /></td></tr>
+<tr class="separator:ga093076a9f9d263d486c480adca344fa5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga59980af3d2ecadde5e03da3d3dcfba6a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__Base.html#ga39db6982619d623273fad8a383489309">Bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__I2C.html#ga59980af3d2ecadde5e03da3d3dcfba6a">osg_I2c::osg_I2c_sendNonBlocking</a> (<a class="el" href="structosg__I2c.html">osg_I2c</a> *self, const uint16_t slaveAddress, void *buffer, const <a class="el" href="group__Base.html#gaf9ecec2d692138fab9167164a457cbd4">Size</a> size)</td></tr>
+<tr class="memdesc:ga59980af3d2ecadde5e03da3d3dcfba6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs a send in non-blocking mode.  <a href="#ga59980af3d2ecadde5e03da3d3dcfba6a">More...</a><br /></td></tr>
+<tr class="separator:ga59980af3d2ecadde5e03da3d3dcfba6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga58f811ee77857b61f8237283705058bf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__I2C.html#ga58f811ee77857b61f8237283705058bf">osg_I2c::osg_I2c_setBufferedCallbacks</a> (<a class="el" href="structosg__I2c.html">osg_I2c</a> *self, <a class="el" href="group__I2C.html#ga7f051fc91fdfd4397428b1dcfa240786">osg_I2cCallback</a> tx, <a class="el" href="group__I2C.html#ga7f051fc91fdfd4397428b1dcfa240786">osg_I2cCallback</a> rx)</td></tr>
+<tr class="memdesc:ga58f811ee77857b61f8237283705058bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers the callbacks to call in buffered mode.  <a href="#ga58f811ee77857b61f8237283705058bf">More...</a><br /></td></tr>
+<tr class="separator:ga58f811ee77857b61f8237283705058bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae54c9b5322bcc4b7bba94fc4dc002564"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__I2C.html#gae54c9b5322bcc4b7bba94fc4dc002564">osg_I2c::osg_I2c_setNbCallbacks</a> (<a class="el" href="structosg__I2c.html">osg_I2c</a> *self, <a class="el" href="group__I2C.html#ga7f051fc91fdfd4397428b1dcfa240786">osg_I2cCallback</a> tx, <a class="el" href="group__I2C.html#ga7f051fc91fdfd4397428b1dcfa240786">osg_I2cCallback</a> rx)</td></tr>
+<tr class="memdesc:gae54c9b5322bcc4b7bba94fc4dc002564"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers the callbacks to call after a non-blocking communication.  <a href="#gae54c9b5322bcc4b7bba94fc4dc002564">More...</a><br /></td></tr>
+<tr class="separator:gae54c9b5322bcc4b7bba94fc4dc002564"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga87d263ab7b92c1c01c766bd405fc6327"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__I2C.html#ga87d263ab7b92c1c01c766bd405fc6327">osg_I2c::osg_I2c_startReceiveBuffered</a> (<a class="el" href="structosg__I2c.html">osg_I2c</a> *self)</td></tr>
+<tr class="memdesc:ga87d263ab7b92c1c01c766bd405fc6327"><td class="mdescLeft">&#160;</td><td class="mdescRight">Use this method to start storing data in buffer.  <a href="#ga87d263ab7b92c1c01c766bd405fc6327">More...</a><br /></td></tr>
+<tr class="separator:ga87d263ab7b92c1c01c766bd405fc6327"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga62fc2581a368e3f9ad30ed8305c62fd7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__I2C.html#ga62fc2581a368e3f9ad30ed8305c62fd7">osg_I2c::osg_I2c_stopReceiveBuffered</a> (<a class="el" href="structosg__I2c.html">osg_I2c</a> *self)</td></tr>
+<tr class="memdesc:ga62fc2581a368e3f9ad30ed8305c62fd7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Use this method to stop storing data in buffer.  <a href="#ga62fc2581a368e3f9ad30ed8305c62fd7">More...</a><br /></td></tr>
+<tr class="separator:ga62fc2581a368e3f9ad30ed8305c62fd7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>Methods for I2C </p>
+<h2 class="groupheader">Typedef Documentation</h2>
+<a id="ga7f051fc91fdfd4397428b1dcfa240786"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga7f051fc91fdfd4397428b1dcfa240786">&#9670;&nbsp;</a></span>osg_I2cCallback</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef void(*  osg_I2cCallback) (void)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Convenience type for I2C callback. </p>
+
+</div>
+</div>
 <h2 class="groupheader">Enumeration Type Documentation</h2>
 <a id="gac5b6ef3c6fe57cd824762c8db2c6585f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#gac5b6ef3c6fe57cd824762c8db2c6585f">&#9670;&nbsp;</a></span>osg_I2cAddressingMode</h2>
@@ -138,6 +183,22 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>The possible I2C addressing mode. </p>
+
+</div>
+</div>
+<a id="ga3088ff05f5b6597f5bd3331406c2bad7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga3088ff05f5b6597f5bd3331406c2bad7">&#9670;&nbsp;</a></span>osg_I2cFlags</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="group__I2C.html#ga3088ff05f5b6597f5bd3331406c2bad7">osg_I2cFlags</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Enum used to represent I2C internal bit flags. </p>
 
 </div>
 </div>
@@ -174,45 +235,8 @@ Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="ga6a31b6d87ba2d7ec5b462478c836c496"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga6a31b6d87ba2d7ec5b462478c836c496">&#9670;&nbsp;</a></span>osg_I2c_abortNonBlockingCommunication()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void osg_I2c_abortNonBlockingCommunication </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="structosg__I2c.html">osg_I2c</a> *&#160;</td>
-          <td class="paramname"><em>self</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint16_t&#160;</td>
-          <td class="paramname"><em>slaveAddress</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Abort an I2C communication. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">self</td><td>The I2C object. </td></tr>
-    <tr><td class="paramname">slaveAddress</td><td>If the device is the <em>master</em> this parameter identifies what communication should be aborted. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="ga3c4136ab064e3d152ad319ad0c5d529d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga3c4136ab064e3d152ad319ad0c5d529d">&#9670;&nbsp;</a></span>osg_I2c_ctor()</h2>
+<a id="ga7d74f062eac7d2782d7ab16e49518bb6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga7d74f062eac7d2782d7ab16e49518bb6">&#9670;&nbsp;</a></span>osg_I2c_ctor()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -262,6 +286,30 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>circularTxBuffer</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__Base.html#gaf9ecec2d692138fab9167164a457cbd4">Size</a>&#160;</td>
+          <td class="paramname"><em>txBufferSize</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>circularRxBuffer</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__Base.html#gaf9ecec2d692138fab9167164a457cbd4">Size</a>&#160;</td>
+          <td class="paramname"><em>rxBufferSize</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">const osg_GpioId&#160;</td>
           <td class="paramname"><em>sdaPin</em>, </td>
         </tr>
@@ -289,6 +337,10 @@ Functions</h2></td></tr>
     <tr><td class="paramname">addressingMode</td><td>The I2C <em>slave</em> addressing mode. </td></tr>
     <tr><td class="paramname">enableGeneralCall</td><td>Indicates if the <em>slave</em> accepts a General Call. </td></tr>
     <tr><td class="paramname">ownAddress</td><td>I2C <em>slave</em> address. </td></tr>
+    <tr><td class="paramname">circularTxBuffer</td><td>Optional buffer to be used for implementing the transmission queue </td></tr>
+    <tr><td class="paramname">txBufferSize</td><td>Transmission buffer size </td></tr>
+    <tr><td class="paramname">circularRxBuffer</td><td>Optional buffer to be used for implementing the receive queue </td></tr>
+    <tr><td class="paramname">rxBufferSize</td><td>Receive buffer size </td></tr>
     <tr><td class="paramname">sdaPin</td><td>Board PIN used for I2C SDA port. </td></tr>
     <tr><td class="paramname">sclPin</td><td>Board PIN used for I2C SCL port. </td></tr>
   </table>
@@ -323,8 +375,35 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="ga5b2b009a150ae3b16aec073f81eea4dd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga5b2b009a150ae3b16aec073f81eea4dd">&#9670;&nbsp;</a></span>osg_I2c_receiveBlocking()</h2>
+<a id="gacb7c99b3e1f80c1a31518ecbd6d630a7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gacb7c99b3e1f80c1a31518ecbd6d630a7">&#9670;&nbsp;</a></span>osg_I2c_isReceiveBufferedEnabled()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__Base.html#ga39db6982619d623273fad8a383489309">Bool</a> osg_I2c_isReceiveBufferedEnabled </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structosg__I2c.html">osg_I2c</a> *&#160;</td>
+          <td class="paramname"><em>self</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Use this method to know whether the buffer is enabled. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">self</td><td>The I2C object. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>TRUE if the buffer is enabled. </dd></dl>
+
+</div>
+</div>
+<a id="gab4b6e47d74d7d3fc0aa8caf284926772"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gab4b6e47d74d7d3fc0aa8caf284926772">&#9670;&nbsp;</a></span>osg_I2c_receiveBlocking()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -344,13 +423,13 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const void *&#160;</td>
+          <td class="paramtype">void *&#160;</td>
           <td class="paramname"><em>buffer</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const size_t&#160;</td>
+          <td class="paramtype">const <a class="el" href="group__Base.html#gaf9ecec2d692138fab9167164a457cbd4">Size</a>&#160;</td>
           <td class="paramname"><em>size</em>, </td>
         </tr>
         <tr>
@@ -367,23 +446,75 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Performs a receive in blocking mode. </p>
+<p>Receive an amount of bytes in blocking mode. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">self</td><td>The I2C object. </td></tr>
     <tr><td class="paramname">slaveAddress</td><td>The I2C slave address of the receiver. Used only if the device is the <em>master</em>. </td></tr>
-    <tr><td class="paramname">buffer</td><td>A pointer to the message. </td></tr>
-    <tr><td class="paramname">size</td><td>The size of the buffer. </td></tr>
+    <tr><td class="paramname">buffer</td><td>The buffer where the data received are stored. </td></tr>
+    <tr><td class="paramname">size</td><td>The amount of data to be received. </td></tr>
     <tr><td class="paramname">timeout</td><td>The amount of time in seconds to wait for transmission. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Returns TRUE if the buffer is successful transmitted. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>TRUE if no errors occur. </dd></dl>
 
 </div>
 </div>
-<a id="gaa66f31f1745740932945871bcac49f33"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gaa66f31f1745740932945871bcac49f33">&#9670;&nbsp;</a></span>osg_I2c_receiveNonBlocking()</h2>
+<a id="ga15a4c6d1eaa4507b42f1d9f018f09259"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga15a4c6d1eaa4507b42f1d9f018f09259">&#9670;&nbsp;</a></span>osg_I2c_receiveBuffered()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__Base.html#gaf9ecec2d692138fab9167164a457cbd4">Size</a> osg_I2c_receiveBuffered </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structosg__I2c.html">osg_I2c</a> *&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint16_t&#160;</td>
+          <td class="paramname"><em>slaveAddress</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>buffer</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group__Base.html#gaf9ecec2d692138fab9167164a457cbd4">Size</a>&#160;</td>
+          <td class="paramname"><em>bufferSize</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Use this method to get the data received through UART in circular-buffered mode. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">self</td><td>The I2C object. </td></tr>
+    <tr><td class="paramname">slaveAddress</td><td>The I2C slave address of the receiver. Used only if the device is the <em>master</em>. </td></tr>
+    <tr><td class="paramname">buffer</td><td>The buffer where the data are stored. </td></tr>
+    <tr><td class="paramname">bufferSize</td><td>The size of the buffer </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The amount of bytes wrote into the buffer. </dd></dl>
+
+</div>
+</div>
+<a id="gae25a2b9d0e18dc20f65c7dc34b271efa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gae25a2b9d0e18dc20f65c7dc34b271efa">&#9670;&nbsp;</a></span>osg_I2c_receiveNonBlocking()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -403,13 +534,13 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const void *&#160;</td>
+          <td class="paramtype">void *&#160;</td>
           <td class="paramname"><em>buffer</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const size_t&#160;</td>
+          <td class="paramtype">const <a class="el" href="group__Base.html#gaf9ecec2d692138fab9167164a457cbd4">Size</a>&#160;</td>
           <td class="paramname"><em>size</em>&#160;</td>
         </tr>
         <tr>
@@ -420,73 +551,22 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Performs a receive in nonblocking mode. </p>
+<p>Receive an amount of data in non-blocking mode. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">self</td><td>The I2C object. </td></tr>
     <tr><td class="paramname">slaveAddress</td><td>The I2C slave address of the receiver. Used only if the device is the <em>master</em>. </td></tr>
-    <tr><td class="paramname">buffer</td><td>A pointer to the message. </td></tr>
-    <tr><td class="paramname">size</td><td>The size of the buffer. </td></tr>
+    <tr><td class="paramname">buffer</td><td>The buffer where the data received are stored. </td></tr>
+    <tr><td class="paramname">size</td><td>The amount of data to be received. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Returns TRUE if the request id successful handled. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>TRUE if the request is successful handled. </dd></dl>
 
 </div>
 </div>
-<a id="gacf2fe2657c415721c6a5dc2119b8ba46"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gacf2fe2657c415721c6a5dc2119b8ba46">&#9670;&nbsp;</a></span>osg_I2c_registerNonBlockingCallbacks()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void osg_I2c_registerNonBlockingCallbacks </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="structosg__I2c.html">osg_I2c</a> *&#160;</td>
-          <td class="paramname"><em>self</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">osg_I2CCallback&#160;</td>
-          <td class="paramname"><em>txCompletedCallback</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">osg_I2CCallback&#160;</td>
-          <td class="paramname"><em>rxCompletedCallback</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">osg_I2CCallback&#160;</td>
-          <td class="paramname"><em>errorCallback</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Register user's callbacks for non-blocking communications. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">self</td><td>The I2C object </td></tr>
-    <tr><td class="paramname">txCompletedCallback</td><td>Callback executed after a successful transmission. </td></tr>
-    <tr><td class="paramname">rxCompletedCallback</td><td>Callback executed after a successful reception. </td></tr>
-    <tr><td class="paramname">errorCallback</td><td>Callback executed if an error occurs during a communication. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="ga0c6d892cf84f9bfd21ee1437fc636ee2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga0c6d892cf84f9bfd21ee1437fc636ee2">&#9670;&nbsp;</a></span>osg_I2c_sendBlocking()</h2>
+<a id="ga16d3394cf179ba49ac0d18a4bfc513bf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga16d3394cf179ba49ac0d18a4bfc513bf">&#9670;&nbsp;</a></span>osg_I2c_sendBlocking()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -506,13 +586,13 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const void *&#160;</td>
+          <td class="paramtype">void *&#160;</td>
           <td class="paramname"><em>buffer</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const size_t&#160;</td>
+          <td class="paramtype">const <a class="el" href="group__Base.html#gaf9ecec2d692138fab9167164a457cbd4">Size</a>&#160;</td>
           <td class="paramname"><em>size</em>, </td>
         </tr>
         <tr>
@@ -544,14 +624,14 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="ga64a0d763e0b506ff1e9018d4519ea303"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga64a0d763e0b506ff1e9018d4519ea303">&#9670;&nbsp;</a></span>osg_I2c_sendNonBlocking()</h2>
+<a id="ga093076a9f9d263d486c480adca344fa5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga093076a9f9d263d486c480adca344fa5">&#9670;&nbsp;</a></span>osg_I2c_sendBuffered()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__Base.html#ga39db6982619d623273fad8a383489309">Bool</a> osg_I2c_sendNonBlocking </td>
+          <td class="memname"><a class="el" href="group__Base.html#ga39db6982619d623273fad8a383489309">Bool</a> osg_I2c_sendBuffered </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="structosg__I2c.html">osg_I2c</a> *&#160;</td>
           <td class="paramname"><em>self</em>, </td>
@@ -571,7 +651,59 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const size_t&#160;</td>
+          <td class="paramtype">const <a class="el" href="group__Base.html#gaf9ecec2d692138fab9167164a457cbd4">Size</a>&#160;</td>
+          <td class="paramname"><em>bufferSize</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Use this method to send an amount of data through UART in buffered mode. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">self</td><td>The I2C object. </td></tr>
+    <tr><td class="paramname">slaveAddress</td><td>The I2C slave address of the receiver. Used only if the device is the <em>master</em>. </td></tr>
+    <tr><td class="paramname">buffer</td><td>The pointer to a valid buffer contains the data to send. </td></tr>
+    <tr><td class="paramname">bufferSize</td><td>The size of the buffer. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Returns TRUE if the request is successful handled. </dd></dl>
+
+</div>
+</div>
+<a id="ga59980af3d2ecadde5e03da3d3dcfba6a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga59980af3d2ecadde5e03da3d3dcfba6a">&#9670;&nbsp;</a></span>osg_I2c_sendNonBlocking()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__Base.html#ga39db6982619d623273fad8a383489309">Bool</a> osg_I2c_sendNonBlocking </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structosg__I2c.html">osg_I2c</a> *&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint16_t&#160;</td>
+          <td class="paramname"><em>slaveAddress</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>buffer</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="group__Base.html#gaf9ecec2d692138fab9167164a457cbd4">Size</a>&#160;</td>
           <td class="paramname"><em>size</em>&#160;</td>
         </tr>
         <tr>
@@ -592,7 +724,147 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Returns TRUE if the request id successful handled. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Returns TRUE if the request is successful handled. </dd></dl>
+
+</div>
+</div>
+<a id="ga58f811ee77857b61f8237283705058bf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga58f811ee77857b61f8237283705058bf">&#9670;&nbsp;</a></span>osg_I2c_setBufferedCallbacks()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void osg_I2c_setBufferedCallbacks </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structosg__I2c.html">osg_I2c</a> *&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__I2C.html#ga7f051fc91fdfd4397428b1dcfa240786">osg_I2cCallback</a>&#160;</td>
+          <td class="paramname"><em>tx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__I2C.html#ga7f051fc91fdfd4397428b1dcfa240786">osg_I2cCallback</a>&#160;</td>
+          <td class="paramname"><em>rx</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Registers the callbacks to call in buffered mode. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">self</td><td>The I2C object. </td></tr>
+    <tr><td class="paramname">tx</td><td>The callback for successful transmission communication. </td></tr>
+    <tr><td class="paramname">rx</td><td>The callback for successful reception communication. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gae54c9b5322bcc4b7bba94fc4dc002564"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gae54c9b5322bcc4b7bba94fc4dc002564">&#9670;&nbsp;</a></span>osg_I2c_setNbCallbacks()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void osg_I2c_setNbCallbacks </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structosg__I2c.html">osg_I2c</a> *&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__I2C.html#ga7f051fc91fdfd4397428b1dcfa240786">osg_I2cCallback</a>&#160;</td>
+          <td class="paramname"><em>tx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__I2C.html#ga7f051fc91fdfd4397428b1dcfa240786">osg_I2cCallback</a>&#160;</td>
+          <td class="paramname"><em>rx</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Registers the callbacks to call after a non-blocking communication. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">self</td><td>The I2C object. </td></tr>
+    <tr><td class="paramname">tx</td><td>The callback for successful transmission communication. </td></tr>
+    <tr><td class="paramname">rx</td><td>The callback for successful reception communication. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga87d263ab7b92c1c01c766bd405fc6327"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga87d263ab7b92c1c01c766bd405fc6327">&#9670;&nbsp;</a></span>osg_I2c_startReceiveBuffered()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void osg_I2c_startReceiveBuffered </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structosg__I2c.html">osg_I2c</a> *&#160;</td>
+          <td class="paramname"><em>self</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Use this method to start storing data in buffer. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">self</td><td>The I2C object. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga62fc2581a368e3f9ad30ed8305c62fd7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga62fc2581a368e3f9ad30ed8305c62fd7">&#9670;&nbsp;</a></span>osg_I2c_stopReceiveBuffered()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void osg_I2c_stopReceiveBuffered </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structosg__I2c.html">osg_I2c</a> *&#160;</td>
+          <td class="paramname"><em>self</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Use this method to stop storing data in buffer. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">self</td><td>The I2C object. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>

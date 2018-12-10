@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>OSG: Data Fields - Functions</title>
+<title>osG: Data Fields - Functions</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">OSG
+   <div id="projectname">osG
    &#160;<span id="projectnumber">0.1.0</span>
    </div>
   </td>
@@ -71,6 +71,9 @@ $(function() {
 <li>osg_CircularFifo_dtor()
 : <a class="el" href="group__CircularFifo.html#ga90785a3ce888edcfbfb94365f5b16c1d">osg_CircularFifo</a>
 </li>
+<li>osg_CircularFifo_getFilledBuffer()
+: <a class="el" href="group__CircularFifo.html#ga111efa7ec37a7b79f628dce1429c4f59">osg_CircularFifo</a>
+</li>
 <li>osg_CircularFifo_getSize()
 : <a class="el" href="group__CircularFifo.html#gada5b5288fd981d1d1f91399f95efe93a">osg_CircularFifo</a>
 </li>
@@ -80,11 +83,17 @@ $(function() {
 <li>osg_CircularFifo_isFull()
 : <a class="el" href="group__CircularFifo.html#gaa2804aa978be643b261e252d889ceade">osg_CircularFifo</a>
 </li>
+<li>osg_CircularFifo_isNull()
+: <a class="el" href="group__CircularFifo.html#ga4f0cbf0c8bd72be7fcafbba4d04f4892">osg_CircularFifo</a>
+</li>
 <li>osg_CircularFifo_popBuffer()
 : <a class="el" href="group__CircularFifo.html#ga960f035fcdcdb76afa9f5b33593b1d59">osg_CircularFifo</a>
 </li>
 <li>osg_CircularFifo_popByte()
 : <a class="el" href="group__CircularFifo.html#ga4d457e62921cd8fbadb083a2bd3599cd">osg_CircularFifo</a>
+</li>
+<li>osg_CircularFifo_popBytes()
+: <a class="el" href="group__CircularFifo.html#ga7875b2f1da24a704e618e008ccbc0ac8">osg_CircularFifo</a>
 </li>
 <li>osg_CircularFifo_pushBuffer()
 : <a class="el" href="group__CircularFifo.html#gac580b01d32b5d691c3271dfce2738f5e">osg_CircularFifo</a>
@@ -125,29 +134,44 @@ $(function() {
 <li>osg_Gpio_write()
 : <a class="el" href="group__Gpio.html#gaf6af6f20fc74d2ee6c64406de7157293">osg_Gpio</a>
 </li>
-<li>osg_I2c_abortNonBlockingCommunication()
-: <a class="el" href="group__I2C.html#ga6a31b6d87ba2d7ec5b462478c836c496">osg_I2c</a>
-</li>
 <li>osg_I2c_ctor()
-: <a class="el" href="group__I2C.html#ga3c4136ab064e3d152ad319ad0c5d529d">osg_I2c</a>
+: <a class="el" href="group__I2C.html#ga7d74f062eac7d2782d7ab16e49518bb6">osg_I2c</a>
 </li>
 <li>osg_I2c_dtor()
 : <a class="el" href="group__I2C.html#ga22cc332db7ddfdaa4be1237f515f9855">osg_I2c</a>
 </li>
+<li>osg_I2c_isReceiveBufferedEnabled()
+: <a class="el" href="group__I2C.html#gacb7c99b3e1f80c1a31518ecbd6d630a7">osg_I2c</a>
+</li>
 <li>osg_I2c_receiveBlocking()
-: <a class="el" href="group__I2C.html#ga5b2b009a150ae3b16aec073f81eea4dd">osg_I2c</a>
+: <a class="el" href="group__I2C.html#gab4b6e47d74d7d3fc0aa8caf284926772">osg_I2c</a>
+</li>
+<li>osg_I2c_receiveBuffered()
+: <a class="el" href="group__I2C.html#ga15a4c6d1eaa4507b42f1d9f018f09259">osg_I2c</a>
 </li>
 <li>osg_I2c_receiveNonBlocking()
-: <a class="el" href="group__I2C.html#gaa66f31f1745740932945871bcac49f33">osg_I2c</a>
-</li>
-<li>osg_I2c_registerNonBlockingCallbacks()
-: <a class="el" href="group__I2C.html#gacf2fe2657c415721c6a5dc2119b8ba46">osg_I2c</a>
+: <a class="el" href="group__I2C.html#gae25a2b9d0e18dc20f65c7dc34b271efa">osg_I2c</a>
 </li>
 <li>osg_I2c_sendBlocking()
-: <a class="el" href="group__I2C.html#ga0c6d892cf84f9bfd21ee1437fc636ee2">osg_I2c</a>
+: <a class="el" href="group__I2C.html#ga16d3394cf179ba49ac0d18a4bfc513bf">osg_I2c</a>
+</li>
+<li>osg_I2c_sendBuffered()
+: <a class="el" href="group__I2C.html#ga093076a9f9d263d486c480adca344fa5">osg_I2c</a>
 </li>
 <li>osg_I2c_sendNonBlocking()
-: <a class="el" href="group__I2C.html#ga64a0d763e0b506ff1e9018d4519ea303">osg_I2c</a>
+: <a class="el" href="group__I2C.html#ga59980af3d2ecadde5e03da3d3dcfba6a">osg_I2c</a>
+</li>
+<li>osg_I2c_setBufferedCallbacks()
+: <a class="el" href="group__I2C.html#ga58f811ee77857b61f8237283705058bf">osg_I2c</a>
+</li>
+<li>osg_I2c_setNbCallbacks()
+: <a class="el" href="group__I2C.html#gae54c9b5322bcc4b7bba94fc4dc002564">osg_I2c</a>
+</li>
+<li>osg_I2c_startReceiveBuffered()
+: <a class="el" href="group__I2C.html#ga87d263ab7b92c1c01c766bd405fc6327">osg_I2c</a>
+</li>
+<li>osg_I2c_stopReceiveBuffered()
+: <a class="el" href="group__I2C.html#ga62fc2581a368e3f9ad30ed8305c62fd7">osg_I2c</a>
 </li>
 <li>osg_Led_ctor()
 : <a class="el" href="group__Led.html#gaacf1020bd3eb770f783b41851d413981">osg_Led</a>
@@ -178,6 +202,33 @@ $(function() {
 </li>
 <li>osg_Led_turnOn()
 : <a class="el" href="group__Led.html#ga5464de581c96835819e2615d3400de96">osg_Led</a>
+</li>
+<li>osg_Spi_ctor()
+: <a class="el" href="group__SPI.html#ga00cab9ee9242d0edcf239ed0e60bae8c">osg_Spi</a>
+</li>
+<li>osg_Spi_dtor()
+: <a class="el" href="group__SPI.html#ga6f6360504faefb0c0244e9fb9a7a932a">osg_Spi</a>
+</li>
+<li>osg_Spi_getSizeOfReceivedData()
+: <a class="el" href="group__SPI.html#ga01bc42dda2ce7e56908721cfdff7e230">osg_Spi</a>
+</li>
+<li>osg_Spi_receiveBlocking()
+: <a class="el" href="group__SPI.html#ga605a4eefb0f9d214aed51bb11bbe4235">osg_Spi</a>
+</li>
+<li>osg_Spi_receivedBuffered()
+: <a class="el" href="group__SPI.html#ga2c5e19d9dad5862815eb212b128d8e07">osg_Spi</a>
+</li>
+<li>osg_Spi_receiveNonBlocking()
+: <a class="el" href="group__SPI.html#gab94eb14007335990c0f2af472e3926d6">osg_Spi</a>
+</li>
+<li>osg_Spi_sendBlocking()
+: <a class="el" href="group__SPI.html#gafdebeec3833acd5eefb5ff08132f0970">osg_Spi</a>
+</li>
+<li>osg_Spi_sendBuffered()
+: <a class="el" href="group__SPI.html#ga25ce95b5178f66f1352756855f5ea563">osg_Spi</a>
+</li>
+<li>osg_Spi_sendNonBlocking()
+: <a class="el" href="group__SPI.html#gaca074d1870fdc158a1c035b209c1b39a">osg_Spi</a>
 </li>
 <li>osg_Thread_ctor()
 : <a class="el" href="group__Thread.html#ga1608224bc2b05ff51d5cd2498ec5720c">osg_Thread</a>
@@ -223,6 +274,45 @@ $(function() {
 </li>
 <li>osg_Timer_stop()
 : <a class="el" href="group__Timer.html#gacde049425af170a406d32f33fd075873">osg_Timer</a>
+</li>
+<li>osg_Uart_ctor()
+: <a class="el" href="group__UART.html#gaa33d2e58b5fb91c7a69b3413b72fcfd9">osg_Uart</a>
+</li>
+<li>osg_Uart_dtor()
+: <a class="el" href="group__UART.html#gaa5e864252222aaf2b76318e2dcf2ba7b">osg_Uart</a>
+</li>
+<li>osg_Uart_isReceiveBufferedEnabled()
+: <a class="el" href="group__UART.html#ga4c4eb94fddc593eee1c044ce4c7c1c96">osg_Uart</a>
+</li>
+<li>osg_Uart_receiveBlocking()
+: <a class="el" href="group__UART.html#gaf17eec912e5779fc1c0a40325d470562">osg_Uart</a>
+</li>
+<li>osg_Uart_receiveBuffered()
+: <a class="el" href="group__UART.html#ga6bdaefd7ef4ff65cedfc609ec00c4d5c">osg_Uart</a>
+</li>
+<li>osg_Uart_receiveNonBlocking()
+: <a class="el" href="group__UART.html#ga99ac0ced885caf8947bbd1ce57d3438a">osg_Uart</a>
+</li>
+<li>osg_Uart_sendBlocking()
+: <a class="el" href="group__UART.html#ga69e59ae3d4b29fe75656c464399ef73c">osg_Uart</a>
+</li>
+<li>osg_Uart_sendBuffered()
+: <a class="el" href="group__UART.html#ga51091135947b5129207c838ff5d71d38">osg_Uart</a>
+</li>
+<li>osg_Uart_sendNonBlocking()
+: <a class="el" href="group__UART.html#ga6146b0e1d0c6249dad5a274d613d0f52">osg_Uart</a>
+</li>
+<li>osg_Uart_setBufferedCallbacks()
+: <a class="el" href="group__UART.html#ga9a88a57e6e669b6b89e813aaac275a83">osg_Uart</a>
+</li>
+<li>osg_Uart_setNbCallbacks()
+: <a class="el" href="group__UART.html#ga1bd6f4b693246ad5ec40df4b57a0b4a2">osg_Uart</a>
+</li>
+<li>osg_Uart_startReceiveBuffered()
+: <a class="el" href="group__UART.html#ga8a1d57d01576492a8a39d521eebad37f">osg_Uart</a>
+</li>
+<li>osg_Uart_stopReceiveBuffered()
+: <a class="el" href="group__UART.html#ga34c6bd4fdf6f48311b5dd5a8574129ed">osg_Uart</a>
 </li>
 </ul>
 </div><!-- contents -->

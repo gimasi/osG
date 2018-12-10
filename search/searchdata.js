@@ -3,9 +3,9 @@ var indexSectionsWithContent =
   0: "bcdgilorstu",
   1: "o",
   2: "o",
-  3: "os",
+  3: "bos",
   4: "bo",
-  5: "bcdgilortu",
+  5: "bcdgilorstu",
   6: "o"
 };
 

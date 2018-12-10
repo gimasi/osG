@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['osg_20library',['OSG library',['../index.html',1,'']]]
+  ['osg_20library',['osG library',['../index.html',1,'']]]
 ];

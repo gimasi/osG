@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['size',['Size',['../group__Base.html#ga224f03120c9d0a9251a05f0a17863bf8',1,'osgDataTypes.h']]]
+  ['size',['Size',['../group__Base.html#gaf9ecec2d692138fab9167164a457cbd4',1,'osgDataTypes.h']]],
+  ['spi',['SPI',['../group__SPI.html',1,'']]]
 ];
