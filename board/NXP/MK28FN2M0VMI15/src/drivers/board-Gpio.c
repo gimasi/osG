@@ -17,322 +17,22 @@
 // Please contact GIMASI at info@gimasi.ch for further information.
 //
 #include "../../../../include/board/drivers/board-Gpio.h"
-#include <osg.h>
+#include "board-GpioSupport.h"
+#include "../../../../../osg/include/osg.h"
 
-#include <fsl_port.h>
-#include <fsl_gpio.h>
-
-
-typedef GPIO_Type osg_board_Gpio;
-typedef PORT_Type osg_board_Port;
-static osg_GpioInterruptCallback _osg_gpioCallbacks[OSG_GPIO_PORT_NUMBER];
-port_mux_t _osg_board_I2c_getPinPortMuxForI2c(const osg_GpioId pin);
-port_mux_t _osg_board_spi_getPinPortMuxForSpi(const osg_GpioId pin);
-port_mux_t _osg_board_Uart_getPinPortMuxForUart(const osg_GpioId pin);
-
-static osg_board_Gpio * _osg_board_gpio_getGpioHandler(const osg_GpioPort port)
+void osg_board_Gpio_ctor(osg_Gpio * self,
+                         const osg_GpioConfig * const config)
 {
-    switch (port)
-    {
-#ifdef GPIOA
-        case OSG_GPIO_PORT_A: return GPIOA;
-#endif
-#ifdef GPIOB
-        case OSG_GPIO_PORT_B: return GPIOB;
-#endif
-#ifdef GPIOC
-        case OSG_GPIO_PORT_C: return GPIOC;
-#endif
-#ifdef GPIOD
-        case OSG_GPIO_PORT_D: return GPIOD;
-#endif
-#ifdef GPIOE
-        case OSG_GPIO_PORT_E: return GPIOE;
-#endif
-#ifdef GPIOF
-        case OSG_GPIO_PORT_F: return GPIOF;
-#endif
-#ifdef GPIOG
-        case OSG_GPIO_PORT_G: return GPIOG;
-#endif
-#ifdef GPIOH
-        case OSG_GPIO_PORT_H: return GPIOH;
-#endif
-#ifdef GPIOI
-        case OSG_GPIO_PORT_I: return GPIOI;
-#endif
-        default:
-            osg_error("ERROR: GPIO Port not recognized.");
-            break;;
-    }
-
-    return NULL;
-}
-
-osg_board_Port * _osg_board_gpio_getPortHandler(const osg_GpioPort port)
-{
-    switch (port)
-    {
-#ifdef PORTA
-        case OSG_GPIO_PORT_A: return PORTA;
-#endif
-#ifdef PORTB
-        case OSG_GPIO_PORT_B: return PORTB;
-#endif
-#ifdef PORTC
-        case OSG_GPIO_PORT_C: return PORTC;
-#endif
-#ifdef PORTD
-        case OSG_GPIO_PORT_D: return PORTD;
-#endif
-#ifdef PORTE
-        case OSG_GPIO_PORT_E: return PORTE;
-#endif
-#ifdef PORTF
-        case OSG_GPIO_PORT_F: return PORTF;
-#endif
-#ifdef PORTG
-        case OSG_GPIO_PORT_G: return PORTG;
-#endif
-#ifdef PORTH
-        case OSG_GPIO_PORT_H: return PORTH;
-#endif
-#ifdef PORTI
-        case OSG_GPIO_PORT_I: return PORTI;
-#endif
-        default:
-            osg_error("ERROR: GPIO Port not recognized.");
-            break;;
-    }
-
-    return NULL;
-}
-
-static gpio_pin_direction_t _osg_board_gpio_getDirection(const osg_GpioMode value)
-{
-    switch (value)
-    {
-        case OSG_GPIO_MODE_IT_RISING:
-        case OSG_GPIO_MODE_IT_FALLING:
-        case OSG_GPIO_MODE_IT_RISING_FALLING:
-        case OSG_GPIO_MODE_IT_LOGIC_0:
-        case OSG_GPIO_MODE_IT_LOGIC_1:
-        case OSG_GPIO_MODE_INPUT:
-            return kGPIO_DigitalInput;
-        case OSG_GPIO_MODE_OUTPUT_PP:
-        case OSG_GPIO_MODE_OUTPUT_OD:
-            return kGPIO_DigitalOutput;
-        default:
-            osg_error("ERROR: Invalid GPIO Mode.");
-            break;
-    }
-
-    return kGPIO_DigitalInput;
-}
-
-static uint32_t _osg_board_gpio_getPull(const osg_GpioPull value)
-{
-    switch (value)
-    {
-        case OSG_GPIO_NOPULL: return kPORT_PullDisable;
-        case OSG_GPIO_PULLUP: return kPORT_PullUp;
-        case OSG_GPIO_PULLDOWN: return kPORT_PullDown;
-        default:
-            osg_error("ERROR: Invalid GPIO Pull.");
-            break;
-    }
-
-    return 0xFFFFFFFF;
-}
-
-static uint32_t _osg_board_gpio_getSpeed(const osg_GpioSpeed value)
-{
-    switch (value)
-    {
-        case OSG_GPIO_SPEED_FREQ_LOW: return kPORT_SlowSlewRate;
-        case OSG_GPIO_SPEED_FREQ_VERY_HIGH: return kPORT_FastSlewRate;
-        default:
-            osg_error("ERROR: Invalid GPIO Speed. For this architecture use OSG_GPIO_SPEED_FREQ_LOW or OSG_GPIO_SPEED_FREQ_VERY_HIGH");
-            break;
-
-    }
-
-    return 0xFFFFFFFF;
-}
-
-static uint32_t _osg_board_gpio_getOpenDrain(const osg_GpioMode value)
-{
-    switch (value)
-    {
-        case OSG_GPIO_MODE_OUTPUT_OD:
-        case OSG_GPIO_MODE_AF_OD:
-            return kPORT_OpenDrainEnable;
-        default:
-            return kPORT_OpenDrainDisable;
-    }
-}
-
-static port_interrupt_t _osg_board_gpio_getInterruptEdge(const osg_GpioMode value)
-{
-    switch (value)
-    {
-        case OSG_GPIO_MODE_IT_RISING: return kPORT_InterruptRisingEdge;
-        case OSG_GPIO_MODE_IT_FALLING: return kPORT_InterruptFallingEdge;
-        case OSG_GPIO_MODE_IT_RISING_FALLING: return kPORT_InterruptEitherEdge;
-        case OSG_GPIO_MODE_IT_LOGIC_0: return kPORT_InterruptLogicZero;
-        case OSG_GPIO_MODE_IT_LOGIC_1: return kPORT_InterruptLogicOne;
-        default:
-            osg_error("ERROR: Invalid GPIO Interrupt Edge.");
-            break;
-    }
-
-    // suppress warning
-    return kPORT_InterruptRisingEdge;
-}
-
-static port_mux_t _osg_board_gpio_getAlternate(const osg_GpioAlternateFunction value, const osg_GpioId pin)
-{
-    switch (value)
-    {
-        case OSG_GPIO_ALTERNATE_DEFAULT: return kPORT_MuxAsGpio;
-        case OSG_GPIO_ALTERNATE_I2C0:
-        case OSG_GPIO_ALTERNATE_I2C1:
-        case OSG_GPIO_ALTERNATE_I2C2:
-        case OSG_GPIO_ALTERNATE_I2C3:
-            return _osg_board_I2c_getPinPortMuxForI2c(pin);
-        case OSG_GPIO_ALTERNATE_SPI1:
-        case OSG_GPIO_ALTERNATE_SPI2:
-        case OSG_GPIO_ALTERNATE_SPI3:
-            return _osg_board_spi_getPinPortMuxForSpi(pin);
-        case OSG_GPIO_ALTERNATE_UART0:
-        case OSG_GPIO_ALTERNATE_UART1:
-        case OSG_GPIO_ALTERNATE_UART2:
-        case OSG_GPIO_ALTERNATE_UART3:
-        case OSG_GPIO_ALTERNATE_UART4:
-            return _osg_board_Uart_getPinPortMuxForUart(pin);
-        default:
-            osg_error("ERROR: Invalid GPIO Alternate Function.");
-            break;
-    }
-
-    // suppress warning
-    return kPORT_MuxAsGpio;
-}
-
-static uint32_t _osg_board_gpio_getBoardGpioPin(osg_GpioPin osgPin)
-{
-    return (uint32_t)osgPin;
-}
-
-static Bool _osg_board_gpio_isInterruptMode(const osg_GpioMode value)
-{
-    switch (value)
-    {
-        case OSG_GPIO_MODE_IT_RISING:
-        case OSG_GPIO_MODE_IT_FALLING:
-        case OSG_GPIO_MODE_IT_RISING_FALLING:
-        case OSG_GPIO_MODE_IT_LOGIC_0:
-        case OSG_GPIO_MODE_IT_LOGIC_1:
-            return TRUE;
-        default:
-            return FALSE;
-    }
-}
-
-static IRQn_Type _osg_board_gpio_getIrqType(const osg_GpioPort port)
-{
-    switch (port)
-    {
-#ifdef PORTA
-        case OSG_GPIO_PORT_A: return PORTA_IRQn;
-#endif
-#ifdef PORTB
-        case OSG_GPIO_PORT_B: return PORTB_IRQn;
-#endif
-#ifdef PORTC
-        case OSG_GPIO_PORT_C: return PORTC_IRQn;
-#endif
-#ifdef PORTD
-        case OSG_GPIO_PORT_D: return PORTD_IRQn;
-#endif
-#ifdef PORTE
-        case OSG_GPIO_PORT_E: return PORTE_IRQn;
-#endif
-#ifdef PORTF
-        case OSG_GPIO_PORT_F: return PORTF_IRQn;
-#endif
-#ifdef PORTG
-        case OSG_GPIO_PORT_G: return PORTG_IRQn;
-#endif
-#ifdef PORTH
-        case OSG_GPIO_PORT_H: return PORTH_IRQn;
-#endif
-#ifdef PORTI
-        case OSG_GPIO_PORT_I: return PORTI_IRQn;
-#endif
-        default:
-            osg_error("ERROR: GPIO Port not recognized.");
-            break;;
-    }
-
-    // suppress warning
-    return PORTA_IRQn;
-}
-
-void _osg_board_gpio_enablePort(osg_GpioPort port)
-{
-    switch (port)
-    {
-#ifdef PORTA
-        case OSG_GPIO_PORT_A: CLOCK_EnableClock(kCLOCK_PortA); break;
-#endif
-#ifdef PORTB
-        case OSG_GPIO_PORT_B: CLOCK_EnableClock(kCLOCK_PortB); break;
-#endif
-#ifdef PORTC
-        case OSG_GPIO_PORT_C: CLOCK_EnableClock(kCLOCK_PortC); break;
-#endif
-#ifdef PORTD
-        case OSG_GPIO_PORT_D: CLOCK_EnableClock(kCLOCK_PortD); break;
-#endif
-#ifdef PORTE
-        case OSG_GPIO_PORT_E: CLOCK_EnableClock(kCLOCK_PortE); break;
-#endif
-#ifdef PORTF
-        case OSG_GPIO_PORT_F: CLOCK_EnableClock(kCLOCK_PortF); break;
-#endif
-#ifdef PORTG
-        case OSG_GPIO_PORT_G: CLOCK_EnableClock(kCLOCK_PortG); break;
-#endif
-#ifdef PORTH
-        case OSG_GPIO_PORT_H: CLOCK_EnableClock(kCLOCK_PortH); break;
-#endif
-#ifdef PORTI
-        case OSG_GPIO_PORT_I: CLOCK_EnableClock(kCLOCK_PortI); break;
-#endif
-        default:
-            osg_error("ERROR: Invalid GPIO Port in GPIO initialization.");
-            break;
-    }
-}
-
-void osg_board_gpio_ctor(osg_Gpio * self,
-                         const osg_GpioId id,
-                         const osg_GpioMode mode,
-                         const osg_GpioPull pull,
-                         const osg_GpioSpeed speed,
-                         const osg_GpioAlternateFunction alternate)
-{
-    const osg_GpioPort osg_port = osg_gpio_getPort(id);
-    osg_board_Gpio * gpio = _osg_board_gpio_getGpioHandler(osg_port);
-    osg_board_Port * port = _osg_board_gpio_getPortHandler(osg_port);
-    uint32_t pin = _osg_board_gpio_getBoardGpioPin(osg_gpio_getPin(id));
+    const osg_GpioPort osg_port = osg_Gpio_getPort(config->id);
+    osg_board_Gpio * gpio = _osg_board_Gpio_getGpioHandler(osg_port);
+    osg_board_Port * port = _osg_board_Gpio_getPortHandler(osg_port);
+    uint32_t pin = _osg_board_Gpio_decodeGpioPin(osg_Gpio_getPin(config->id));
 
     self->handler = gpio;
 
-    _osg_board_gpio_enablePort(osg_port);
+    _osg_board_Gpio_enablePort(osg_port);
 
-    if (alternate == OSG_GPIO_ALTERNATE_DEFAULT)
+    if (config->alternate < kPORT_MuxAlt2)
     {
         /* The GPIO pin configuration structure.
         *
@@ -342,9 +42,9 @@ void osg_board_gpio_ctor(osg_Gpio * self,
         *        with the PORT_SetPinConfig().
         */
         gpio_pin_config_t gpioConfig;
-        gpioConfig.pinDirection = _osg_board_gpio_getDirection(mode);
+        gpioConfig.pinDirection = _osg_board_Gpio_decodeDirection(config->mode);
         gpioConfig.outputLogic = 0;
-        
+
         PORT_SetPinMux(port, pin, kPORT_MuxAsGpio);
         GPIO_PinInit(gpio, pin, &gpioConfig);
     }
@@ -352,33 +52,33 @@ void osg_board_gpio_ctor(osg_Gpio * self,
     {
         // PORT pin configuration structure
         port_pin_config_t portConfig;
-        portConfig.pullSelect = _osg_board_gpio_getPull(pull);
-        portConfig.slewRate = _osg_board_gpio_getSpeed(speed);
+        portConfig.pullSelect = _osg_board_Gpio_decodePull(config->pull);
+        portConfig.slewRate = _osg_board_Gpio_decodeSpeed(config->speed);
         //portConfig.passiveFilterEnable;
-        portConfig.openDrainEnable = _osg_board_gpio_getOpenDrain(mode);
+        portConfig.openDrainEnable = _osg_board_Gpio_decodeOpenDrain(config->mode);
         //portConfig.driveStrength;
-        portConfig.mux = _osg_board_gpio_getAlternate(alternate, id);
+        portConfig.mux = config->alternate;
         portConfig.lockRegister = kPORT_UnlockRegister;
-        
+
         PORT_SetPinConfig(port, pin, &portConfig);
-        if (_osg_board_gpio_isInterruptMode(mode) == TRUE)
-            PORT_SetPinInterruptConfig(port, pin, _osg_board_gpio_getInterruptEdge(mode));
+        if (_osg_board_Gpio_isInterruptMode(config->mode) == true)
+            PORT_SetPinInterruptConfig(port, pin, _osg_board_Gpio_decodeInterruptEdge(config->mode));
     }
 
 }
 
-void osg_board_gpio_dtor(osg_Gpio * self)
+void osg_board_Gpio_dtor(osg_Gpio * self)
 {
-    osg_board_Port * port = _osg_board_gpio_getPortHandler(osg_gpio_getPort(self->id));
-    PORT_SetPinMux(port, _osg_board_gpio_getBoardGpioPin(osg_gpio_getPin(self->id)), kPORT_PinDisabledOrAnalog);
+    osg_board_Port * port = _osg_board_Gpio_getPortHandler(osg_Gpio_getPort(self->id));
+    PORT_SetPinMux(port, _osg_board_Gpio_decodeGpioPin(osg_Gpio_getPin(self->id)), kPORT_PinDisabledOrAnalog);
 }
 
-osg_PinMax osg_board_gpio_getMaxPinPerPort(void)
+osg_PinMax osg_board_Gpio_getMaxPinPerPort(void)
 {
     return OSG_32_PIN_PER_PORT;
 }
 
-Bool osg_board_gpio_checkPin(const osg_GpioId id)
+bool osg_board_Gpio_checkPin(const osg_GpioId id)
 {
     // From STM32L476xx data sheet:
     // DM00108832 (DocID025976 Rev 4), Figure 9, pag. 59/232
@@ -504,74 +204,74 @@ Bool osg_board_gpio_checkPin(const osg_GpioId id)
         case OSG_GPIO_PE21:
         case OSG_GPIO_PE22:
         case OSG_GPIO_PE23:
-            return TRUE;
+            return true;
         default:
-            return FALSE;
+            return false;
     }
 }
 
 
 
-Bool osg_board_gpio_read(osg_Gpio * self)
+bool osg_board_Gpio_read(osg_Gpio * self)
 {
-    uint32_t readState = GPIO_PinRead((osg_board_Gpio *)self->handler, (1u << _osg_board_gpio_getBoardGpioPin(osg_gpio_getPin(self->id))));
+    uint32_t readState = GPIO_PinRead((osg_board_Gpio *)self->handler, (_osg_board_Gpio_decodeGpioPin(osg_Gpio_getPin(self->id))));
     if (readState == 0)
-        return FALSE;
+        return false;
     else
-        return TRUE;
+        return true;
 }
 
-void osg_board_gpio_write(osg_Gpio * self, const Bool value)
+void osg_board_Gpio_write(osg_Gpio * self, const bool value)
 {
-    if (value == TRUE)
-        GPIO_PortSet((osg_board_Gpio *)self->handler, (1u << _osg_board_gpio_getBoardGpioPin(osg_gpio_getPin(self->id))));
+    if (value == true)
+        GPIO_PortSet((osg_board_Gpio *)self->handler, (1u << _osg_board_Gpio_decodeGpioPin(osg_Gpio_getPin(self->id))));
     else
-        GPIO_PortClear((osg_board_Gpio *)self->handler, (1u << _osg_board_gpio_getBoardGpioPin(osg_gpio_getPin(self->id))));
+        GPIO_PortClear((osg_board_Gpio *)self->handler, (1u << _osg_board_Gpio_decodeGpioPin(osg_Gpio_getPin(self->id))));
 }
 
-void osg_board_gpio_toggle(osg_Gpio * self)
+void osg_board_Gpio_toggle(osg_Gpio * self)
 {
-    GPIO_PortToggle((osg_board_Gpio *)self->handler, (1u << _osg_board_gpio_getBoardGpioPin(osg_gpio_getPin(self->id))));
+    GPIO_PortToggle((osg_board_Gpio *)self->handler, (1u << _osg_board_Gpio_decodeGpioPin(osg_Gpio_getPin(self->id))));
 }
 
-Bool osg_board_gpio_lock(osg_Gpio * self)
+bool osg_board_Gpio_lock(osg_Gpio * self)
 {
     // to validate
     port_pin_config_t portConfig;
     portConfig.lockRegister = kPORT_LockRegister;
-    osg_board_Port * port = _osg_board_gpio_getPortHandler(osg_gpio_getPort(self->id));
-    uint32_t pin = _osg_board_gpio_getBoardGpioPin(osg_gpio_getPin(self->id));
+    osg_board_Port * port = _osg_board_Gpio_getPortHandler(osg_Gpio_getPort(self->id));
+    uint32_t pin = _osg_board_Gpio_decodeGpioPin(osg_Gpio_getPin(self->id));
     PORT_SetPinConfig(port, pin, &portConfig);
-    return TRUE;
+    return true;
 }
 
-void osg_board_gpio_setExtInterruptCallback(const osg_GpioId id, osg_GpioInterruptCallback callback, const osg_IrqPriority preemptionPriority, const osg_IrqPriority subPriority)
+void osg_board_Gpio_setExtInterruptCallback(const osg_GpioId id, osg_GpioInterruptCallback callback, const osg_IrqPriority preemptionPriority, const osg_IrqPriority subPriority)
 {
-    osg_GpioPort port = osg_gpio_getPort(id);
-    _osg_gpioCallbacks[port] = callback;
+    osg_GpioPort port = osg_Gpio_getPort(id);
+    _osg_board_Gpio_setCallback(port, callback);
 
     if (callback != NULL)
     {
-        osg_board_gpio_enableExtInterrupt(id, preemptionPriority, subPriority);
+        osg_board_Gpio_enableExtInterrupt(id, preemptionPriority, subPriority);
     }
     else
     {
-        osg_board_gpio_disableExtInterrupt(id);
+        osg_board_Gpio_disableExtInterrupt(id);
     }
 }
 
-void osg_board_gpio_enableExtInterrupt(const osg_GpioId id, const osg_IrqPriority preemptionPriority, const osg_IrqPriority subPriority)
+void osg_board_Gpio_enableExtInterrupt(const osg_GpioId id, const osg_IrqPriority preemptionPriority, const osg_IrqPriority subPriority)
 {
-    osg_GpioPort port = osg_gpio_getPort(id);
-    if (_osg_gpioCallbacks[port] == NULL)
+    osg_GpioPort port = osg_Gpio_getPort(id);
+    if (_osg_board_Gpio_getCallback(port) == NULL)
         osg_error("ERROR: Impossible to enable EXT Interrtupt; Callback not set.");
 
-    IRQn_Type irq = _osg_board_gpio_getIrqType(port);
+    IRQn_Type irq = _osg_board_Gpio_decodeIrqType(port);
     EnableIRQ(irq);
 }
 
-void osg_board_gpio_disableExtInterrupt(const osg_GpioId id)
+void osg_board_Gpio_disableExtInterrupt(const osg_GpioId id)
 {
-    IRQn_Type irq = _osg_board_gpio_getIrqType(osg_gpio_getPort(id));
+    IRQn_Type irq = _osg_board_Gpio_decodeIrqType(osg_Gpio_getPort(id));
     DisableIRQ(irq);
 }

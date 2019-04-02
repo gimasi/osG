@@ -16,37 +16,33 @@
 // osG is also available under a commercial license.
 // Please contact GIMASI at info@gimasi.ch for further information.
 //
-#include "osg/drivers/I2c.h"
-#include "osg/drivers/Gpio.h"
-#include "osg/utils.h"
-#include <board.h>
+#include <string.h>
+#include "../../include/osg/drivers/I2c.h"
+#include "../../include/osg/drivers/Gpio.h"
+#include "../../include/osg/utils.h"
+#include "../../../board/include/board.h"
 
-osg_GpioAlternateFunction _osg_board_I2c_getGpioAlternateFunction(const osg_I2cId i2cId);
-
-void osg_I2c_ctor(osg_I2c * self,
-                  const osg_I2cId id,
-                  const osg_I2cMode mode,
-                  const uint32_t clockSpeed,
-                  const osg_I2cAddressingMode addressingMode,
-                  const Bool enableGeneralCall,
-                  const uint16_t ownAddress,
-                  void * circularTxBuffer,
-                  Size txBufferSize,
-                  void * circularRxBuffer,
-                  Size rxBufferSize,
-                  const osg_GpioId sdaPin,
-                  const osg_GpioId sclPin)
+void osg_I2c_ctor(osg_I2c * self, const osg_I2cConfig * const config)
 {
-    osg_assert(osg_board_gpio_checkPin(sdaPin) == TRUE, "ASSERT FAILED: I2C SDA Pin is NOT available on this board. Please check the data sheet.");
-    osg_assert(osg_board_gpio_checkPin(sclPin) == TRUE, "ASSERT FAILED: I2C SCL Pin is NOT available on this board. Please check the data sheet.");
+    osg_assert(osg_board_Gpio_checkPin(config->sdaPin) == true, "ASSERT FAILED: I2C SDA Pin is NOT available on this board. Please check the data sheet.");
+    osg_assert(osg_board_Gpio_checkPin(config->sclPin) == true, "ASSERT FAILED: I2C SCL Pin is NOT available on this board. Please check the data sheet.");
 
-    self->id = id;
-    self->mode = mode;
+    self->id = config->id;
+    self->mode = config->mode;
 
-    osg_Gpio_ctor(&self->sclPin, sclPin, OSG_GPIO_MODE_AF_OD, OSG_GPIO_PULLUP, OSG_GPIO_SPEED_FREQ_VERY_HIGH, _osg_board_I2c_getGpioAlternateFunction(id));
-    osg_Gpio_ctor(&self->sdaPin, sdaPin, OSG_GPIO_MODE_AF_OD, OSG_GPIO_PULLUP, OSG_GPIO_SPEED_FREQ_VERY_HIGH, _osg_board_I2c_getGpioAlternateFunction(id));
+	osg_GpioConfig gpioConfig;
+	memset(&gpioConfig, 0, sizeof(gpioConfig));
+	gpioConfig.mode = OSG_GPIO_MODE_AF_OD;
+	gpioConfig.pull = OSG_GPIO_PULLUP;
+	gpioConfig.speed = OSG_GPIO_SPEED_FREQ_VERY_HIGH;
+	gpioConfig.alternate = config->alternate;
+		
+	gpioConfig.id = config->sclPin;
+    osg_Gpio_ctor(&self->sclPin, &gpioConfig);
+	gpioConfig.id = config->sdaPin;
+    osg_Gpio_ctor(&self->sdaPin, &gpioConfig);
 
-    osg_board_I2c_ctor(self, clockSpeed, addressingMode, enableGeneralCall, ownAddress, circularTxBuffer, txBufferSize, circularRxBuffer, rxBufferSize);
+    osg_board_I2c_ctor(self, config);
 }
 
 void osg_I2c_dtor(osg_I2c * self)
@@ -57,40 +53,9 @@ void osg_I2c_dtor(osg_I2c * self)
     osg_board_I2c_dtor(self);
 }
 
-Bool osg_I2c_sendBlocking(osg_I2c * self, const uint16_t slaveAddress, void * buffer, const size_t size, const uint32_t timeout)
+void osg_I2c_setBuffers(osg_I2c * self, void * circularTxBuffer, const Size txBufferSize, void * circularRxBuffer, const Size rxBufferSize)
 {
-    if (self->mode == OSG_I2C_MASTER_MODE)
-    {
-        return osg_board_I2c_masterSendBlocking(self, slaveAddress, buffer, size, timeout);
-    }
-    else
-    {
-        return osg_board_I2c_slaveSendBlocking(self, buffer, size, timeout);
-    }
-}
-
-Bool osg_I2c_sendNonBlocking(osg_I2c * self, const uint16_t slaveAddress, void * buffer, const size_t size)
-{
-    if (self->mode == OSG_I2C_MASTER_MODE)
-    {
-        return osg_board_I2c_masterSendNonBlocking(self, slaveAddress, buffer, size);
-    }
-    else
-    {
-        return osg_board_I2c_slaveSendNonBlocking(self, buffer, size);
-    }
-}
-
-Bool osg_I2c_sendBuffered(osg_I2c * self, const uint16_t slaveAddress, const void * buffer, const Size bufferSize)
-{
-    if (self->mode == OSG_I2C_MASTER_MODE)
-    {
-        return osg_board_I2c_masterSendBuffered(self, slaveAddress, buffer, bufferSize);
-    }
-    else
-    {
-        return osg_board_I2c_slaveSendBuffered(self, buffer, bufferSize);
-    }
+    osg_board_I2c_setBuffers(self, circularTxBuffer, txBufferSize, circularRxBuffer, rxBufferSize);
 }
 
 void osg_I2c_setBufferedCallbacks(osg_I2c * self, osg_I2cCallback tx, osg_I2cCallback rx)
@@ -103,7 +68,43 @@ void osg_I2c_setNbCallbacks(osg_I2c * self, osg_I2cCallback tx, osg_I2cCallback 
     osg_board_I2c_setNbCallbacks(self, tx, rx);
 }
 
-Bool osg_I2c_receiveBlocking(osg_I2c * self, const uint16_t slaveAddress, void * buffer, const size_t size, const uint32_t timeout)
+bool osg_I2c_sendBlocking(osg_I2c * self, const uint16_t slaveAddress, void * buffer, const size_t size, const uint32_t timeout)
+{
+    if (self->mode == OSG_I2C_MASTER_MODE)
+    {
+        return osg_board_I2c_masterSendBlocking(self, slaveAddress, buffer, size, timeout);
+    }
+    else
+    {
+        return osg_board_I2c_slaveSendBlocking(self, buffer, size, timeout);
+    }
+}
+
+bool osg_I2c_sendNonBlocking(osg_I2c * self, const uint16_t slaveAddress, void * buffer, const size_t size)
+{
+    if (self->mode == OSG_I2C_MASTER_MODE)
+    {
+        return osg_board_I2c_masterSendNonBlocking(self, slaveAddress, buffer, size);
+    }
+    else
+    {
+        return osg_board_I2c_slaveSendNonBlocking(self, buffer, size);
+    }
+}
+
+bool osg_I2c_sendBuffered(osg_I2c * self, const uint16_t slaveAddress, const void * buffer, const Size bufferSize)
+{
+    if (self->mode == OSG_I2C_MASTER_MODE)
+    {
+        return osg_board_I2c_masterSendBuffered(self, slaveAddress, buffer, bufferSize);
+    }
+    else
+    {
+        return osg_board_I2c_slaveSendBuffered(self, buffer, bufferSize);
+    }
+}
+
+bool osg_I2c_receiveBlocking(osg_I2c * self, const uint16_t slaveAddress, void * buffer, const size_t size, const uint32_t timeout)
 {
     if (self->mode == OSG_I2C_MASTER_MODE)
     {
@@ -115,7 +116,7 @@ Bool osg_I2c_receiveBlocking(osg_I2c * self, const uint16_t slaveAddress, void *
     }
 }
 
-Bool osg_I2c_receiveNonBlocking(osg_I2c * self, const uint16_t slaveAddress, void * buffer, const size_t size)
+bool osg_I2c_receiveNonBlocking(osg_I2c * self, const uint16_t slaveAddress, void * buffer, const size_t size)
 {
     if (self->mode == OSG_I2C_MASTER_MODE)
     {
@@ -149,7 +150,38 @@ void osg_I2c_stopReceiveBuffered(osg_I2c * self)
     osg_board_I2c_stopReceiveBuffered(self);
 }
 
-Bool osg_I2c_isReceiveBufferedEnabled(osg_I2c * self)
+bool osg_I2c_isReceiveBufferedEnabled(osg_I2c * self)
 {
     return osg_board_I2c_isReceiveBufferedEnabled(self);
+}
+
+bool osg_I2c_writeMemBlocking(osg_I2c * self, const uint16_t slaveAddress, const uint16_t memAddress, const uint16_t memAddrSize, void * buffer, const Size size, const uint32_t timeout)
+{
+    if (self->mode == OSG_I2C_MASTER_MODE)
+    {
+        return osg_board_I2c_writeMemBlocking(self, slaveAddress, memAddress, memAddrSize, buffer, size, timeout);
+    }
+    else
+    {
+        return false;
+    }
+
+}
+
+bool osg_I2c_readMemBlocking(osg_I2c * self, const uint16_t slaveAddress, const uint16_t memAddress, const uint16_t memAddrSize, void * buffer, const Size size, const uint32_t timeout)
+{
+    if (self->mode == OSG_I2C_MASTER_MODE)
+    {
+        return osg_board_I2c_readMemBlocking(self, slaveAddress, memAddress, memAddrSize, buffer, size, timeout);
+    }
+    else
+    {
+        return false;
+    }
+
+}
+
+uint8_t osg_I2c_countI2cs()
+{
+    return osg_board_I2c_countI2cs();
 }

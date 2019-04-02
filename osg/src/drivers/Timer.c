@@ -16,55 +16,65 @@
 // osG is also available under a commercial license.
 // Please contact GIMASI at info@gimasi.ch for further information.
 //
-#include "osg/drivers/Timer.h"
-#include "osg/utils.h"
-#include <board.h>
-#ifdef OSG_USE_RTOS
-#include <rtos.h>
+#include "../../include/osg/drivers/Timer.h"
+#include "../../include/osg/utils.h"
+#include "../../../board/include/board.h"
+
+#ifdef OSG_HAS_CONFIG_FILE
+    #include <osgConfig.h>
+#else
+    #include "../../../templates/osgConfig.h"
 #endif
 
-void osg_Timer_ctor(osg_Timer * self, const osg_TimerType type, osg_TimerCallback callback, void * argument)
+#if defined(OSG_OS_NAME) && !(OSG_OS_NAME == OSG_OS_NONE)
+#include "../../../rtos/include/rtos.h"
+#endif
+
+void osg_Timer_ctor(osg_Timer * self, const osg_TimerConfig * const config)
 {
-#ifdef OSG_USE_RTOS
-    osg_rtos_Timer_ctor(self, type, callback, argument);
+#if !(defined(OSG_OS_NAME)) || (OSG_OS_NAME == OSG_OS_NONE)
+    osg_board_Timer_ctor(self, config);
 #else
-    osg_board_Timer_ctor(self, type, callback, argument);
+    osg_rtos_Timer_ctor(self, config);
 #endif
 }
 
 void osg_Timer_dtor(osg_Timer * self)
 {
-#ifdef OSG_USE_RTOS
-    osg_rtos_Timer_dtor(self);
-#else
+    if (self == NULL)
+        return;
+
+#if !(defined(OSG_OS_NAME)) || (OSG_OS_NAME == OSG_OS_NONE)
     osg_board_Timer_dtor(self);
+#else
+    osg_rtos_Timer_dtor(self);
 #endif
 }
 
-Bool osg_Timer_start(osg_Timer * self, const uint32_t millis)
+bool osg_Timer_start(osg_Timer * self, const uint32_t millis)
 {
-#ifdef OSG_USE_RTOS
-    return osg_rtos_Timer_start(self, millis);
-#else
+#if !(defined(OSG_OS_NAME)) || (OSG_OS_NAME == OSG_OS_NONE)
     return osg_board_Timer_start(self, millis);
+#else
+    return osg_rtos_Timer_start(self, millis);
 #endif
 }
 
-Bool osg_Timer_stop(osg_Timer * self)
+bool osg_Timer_stop(osg_Timer * self)
 {
-#ifdef OSG_USE_RTOS
-    return osg_rtos_Timer_stop(self);
-#else
+#if !(defined(OSG_OS_NAME)) || (OSG_OS_NAME == OSG_OS_NONE)
     return osg_board_Timer_stop(self);
+#else
+    return osg_rtos_Timer_stop(self);
 #endif
 }
 
-Bool osg_Timer_isRunning(osg_Timer * self)
+bool osg_Timer_isRunning(osg_Timer * self)
 {
-#ifdef OSG_USE_RTOS
-    return osg_rtos_Timer_isRunning(self);
-#else
+#if !(defined(OSG_OS_NAME)) || (OSG_OS_NAME == OSG_OS_NONE)
     return osg_board_Timer_isRunning(self);
+#else
+    return osg_rtos_Timer_isRunning(self);
 #endif
 }
 
@@ -75,9 +85,9 @@ void * osg_Timer_getHandler(osg_Timer * self)
 
 osg_TimerType osg_Timer_getType(osg_Timer * self)
 {
-#ifdef OSG_USE_RTOS
-    return osg_rtos_Timer_getType(self);
-#else
+#if !(defined(OSG_OS_NAME)) || (OSG_OS_NAME == OSG_OS_NONE)
     return osg_board_Timer_getType(self);
+#else
+    return osg_rtos_Timer_getType(self);
 #endif
 }

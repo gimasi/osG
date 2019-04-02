@@ -17,19 +17,19 @@
 // Please contact GIMASI at info@gimasi.ch for further information.
 //
 #include "../../../../include/board/drivers/board-Led.h"
-#include <osg.h>
+#include "../../../../../osg/include/osg.h"
 
-osg_GpioId osg_board_led_getGpioId(const osg_LedId id)
+osg_GpioId osg_board_Led_getGpioId(const osg_LedId id)
 {
     /// @todo
     switch (id)
     {
         case OSG_LED_RED:
-            return osg_gpio_getId(OSG_GPIO_PORT_E, OSG_GPIO_PIN_6);
+            return osg_Gpio_getId(OSG_GPIO_PORT_E, OSG_GPIO_PIN_6);
         case OSG_LED_GREEN:
-            return osg_gpio_getId(OSG_GPIO_PORT_E, OSG_GPIO_PIN_7);
+            return osg_Gpio_getId(OSG_GPIO_PORT_E, OSG_GPIO_PIN_7);
         case OSG_LED_BLUE:
-            return osg_gpio_getId(OSG_GPIO_PORT_E, OSG_GPIO_PIN_8);
+            return osg_Gpio_getId(OSG_GPIO_PORT_E, OSG_GPIO_PIN_8);
         default:
             osg_error("ERROR: Led not supported on this board.");
             break;

@@ -22,5 +22,13 @@ tests/*/*/DebugConfig/*
 tests/*/*/*.scvd
 tests/*/*/*.uvguix.*
 tests/*/*/*.uvgui.*
+**/Objects/*
+**/Listings/*
+**/RTE/*
+**/DebugConfig/*
+**/*.scvd
+**/*.uvguix.*
+**/*.uvgui.*
 **/CMakeLists.txt.user*
 doxygen
+.vscode/*

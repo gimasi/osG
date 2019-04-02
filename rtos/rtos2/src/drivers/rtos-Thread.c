@@ -16,9 +16,10 @@
 // osG is also available under a commercial license.
 // Please contact GIMASI at info@gimasi.ch for further information.
 //
-#include "rtos/drivers/rtos-Thread.h"
-#include "rtos-config.h"
-#include <osg.h>
+#include "../../../include/rtos/drivers/rtos-Thread.h"
+#include "../../include/rtos/rtos-config.h"
+#include "../../../../osg/include/osg.h"
+#include <string.h>
 
 static osg_ThreadState _osg_rtos_thread_getOsgThreadState(osThreadState_t state)
 {
@@ -39,32 +40,52 @@ static osg_ThreadState _osg_rtos_thread_getOsgThreadState(osThreadState_t state)
     return OSG_THREAD_ERROR;
 }
 
-void osg_rtos_Thread_ctor(osg_Thread * self, osg_ThreadFunction function, void * argument, void * attributes)
+void osg_rtos_Thread_ctor(osg_Thread * self, const osg_ThreadConfig * const config)
 {
-    self->handler = osThreadNew((osThreadFunc_t)function, argument, attributes);
+    if (self == NULL)
+        return;
+
+    osThreadAttr_t thAttr;
+    memset(&thAttr, 0, sizeof(thAttr));
+    if (config->attributes.name != NULL)
+        thAttr.name = config->attributes.name;
+    if (config->attributes.stackSize > 0)
+        thAttr.stack_size = config->attributes.stackSize;
+    
+    self->handler = osThreadNew((osThreadFunc_t)config->function, config->argument, &thAttr);
     osg_assert(self->handler != NULL, "ERROR: Cannot initialize thread.");
 }
 
 void osg_rtos_Thread_dtor(osg_Thread * self)
 {
+    if (self == NULL || self->handler == NULL)
+        return;
+
     osThreadTerminate((osThreadId_t)self->handler);
     self->handler = NULL;
 }
 
-Bool osg_rtos_Thread_resume(osg_Thread * self)
+bool osg_rtos_Thread_resume(osg_Thread * self)
 {
-    if (osThreadResume((osThreadId_t)self->handler) == osOK)
-        return TRUE;
+    if (self == NULL || self->handler == NULL)
+        return false;
 
-    return FALSE;
+    return osg_bool(osThreadResume((osThreadId_t)self->handler) == osOK);
 }
 
-Bool osg_rtos_Thread_pause(osg_Thread * self)
+bool osg_rtos_Thread_pause(osg_Thread * self)
 {
-    if (osThreadSuspend((osThreadId_t)self->handler) == osOK)
-        return TRUE;
+    if (self == NULL || self->handler == NULL)
+        return false;
 
-    return FALSE;
+    return osg_bool(osThreadSuspend((osThreadId_t)self->handler) == osOK);
+}
+
+bool osg_rtos_Thread_suspend(void * id)
+{
+    if (id == NULL) return false;
+    
+    return osg_bool(osThreadSuspend((osThreadId_t)id) == osOK);
 }
 
 osg_ThreadState osg_rtos_Thread_getState(osg_Thread * self)
@@ -72,10 +93,20 @@ osg_ThreadState osg_rtos_Thread_getState(osg_Thread * self)
     return _osg_rtos_thread_getOsgThreadState(osThreadGetState((osThreadId_t)self->handler));
 }
 
-Bool osg_rtos_Thread_detach(osg_Thread * self)
+bool osg_rtos_Thread_detach(osg_Thread * self)
 {
-    if (osThreadDetach((osThreadId_t)self->handler) == osOK)
-        return TRUE;
+    if (self == NULL || self->handler == NULL)
+        return false;
 
-    return FALSE;
+    return osg_bool(osThreadDetach((osThreadId_t)self->handler) == osOK);
+}
+
+void * osg_rtos_Thread_getThreadId(void)
+{
+    return osThreadGetId();
+}
+
+void osg_rtos_Thread_yieldNextThread(void)
+{
+    osThreadYield();
 }

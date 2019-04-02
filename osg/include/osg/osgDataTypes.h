@@ -21,24 +21,11 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-enum Bool;
-typedef enum Bool Bool;
-/// @brief Boolean type
-/// @ingroup Base
-enum Bool
-{
-    FALSE = 0,
-    TRUE
-};
-
-/// @brief Casts the condition result to the Bool type
-/// @ingroup Base
-#define osg_bool(cond) ((cond)? TRUE : FALSE)
 
 /// @brief Convenience size type
 /// @ingroup Base

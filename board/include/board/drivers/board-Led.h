@@ -33,7 +33,7 @@ extern "C" {
 /// @ingroup Board-Led
 /// @param id The Led ID
 /// @return The GPIO ID
-osg_GpioId osg_board_led_getGpioId(const osg_LedId id);
+osg_GpioId osg_board_Led_getGpioId(const osg_LedId id);
 
 #ifdef __cplusplus
 }

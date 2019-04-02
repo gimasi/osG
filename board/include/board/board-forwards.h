@@ -21,6 +21,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -29,10 +30,6 @@ extern "C" {
 // /////////////////////////////////////////////////////////////////////////////
 // Data types
 // /////////////////////////////////////////////////////////////////////////////
-
-enum Bool;
-typedef enum Bool Bool;
-
 enum osg_IrqPriority;
 typedef enum osg_IrqPriority osg_IrqPriority;
 
@@ -43,6 +40,9 @@ typedef size_t Size;
 
 typedef uint8_t Byte;
 
+struct osg_CircularFifoConfig;
+typedef struct osg_CircularFifoConfig osg_CircularFifoConfig;
+
 struct osg_CircularFifo;
 typedef struct osg_CircularFifo osg_CircularFifo;
 
@@ -50,22 +50,24 @@ typedef struct osg_CircularFifo osg_CircularFifo;
 // /////////////////////////////////////////////////////////////////////////////
 // BaseHw
 // /////////////////////////////////////////////////////////////////////////////
-
 typedef void (*osg_BaseHwApplication)(void);
 
 // /////////////////////////////////////////////////////////////////////////////
 // Leds
 // /////////////////////////////////////////////////////////////////////////////
-
+#if OSG_USE_LED == 1
 enum osg_LedId;
 typedef enum osg_LedId osg_LedId;
+#endif
 
 // /////////////////////////////////////////////////////////////////////////////
 // Gpio
 // /////////////////////////////////////////////////////////////////////////////
-
 enum osg_GpioId;
 typedef enum osg_GpioId osg_GpioId;
+
+struct osg_GpioConfig;
+typedef struct osg_GpioConfig osg_GpioConfig;
 
 struct osg_Gpio;
 typedef struct osg_Gpio osg_Gpio;
@@ -90,6 +92,9 @@ typedef void (*osg_GpioInterruptCallback)(const osg_GpioPin);
 // /////////////////////////////////////////////////////////////////////////////
 // Timer
 // /////////////////////////////////////////////////////////////////////////////
+#if OSG_USE_TIMER == 1
+struct osg_TimerConfig;
+typedef struct osg_TimerConfig osg_TimerConfig;
 
 struct osg_Timer;
 typedef struct osg_Timer osg_Timer;
@@ -98,23 +103,12 @@ enum osg_TimerType;
 typedef enum osg_TimerType osg_TimerType;
 
 typedef void (*osg_TimerCallback)(void *);
-
-// /////////////////////////////////////////////////////////////////////////////
-// Thread
-// /////////////////////////////////////////////////////////////////////////////
-
-enum osg_ThreadState;
-typedef enum osg_ThreadState osg_ThreadState;
-
-struct osg_Thread;
-typedef struct osg_Thread osg_Thread;
-
-typedef void (*osg_ThreadFunction)(void *);
+#endif
 
 // /////////////////////////////////////////////////////////////////////////////
 // I2C
 // /////////////////////////////////////////////////////////////////////////////
-
+#if OSG_USE_I2C == 1
 enum osg_I2cMode;
 typedef enum osg_I2cMode osg_I2cMode;
 
@@ -132,13 +126,17 @@ typedef void (* osg_I2cCallback)(void);
 struct osg_I2cImpl;
 typedef struct osg_I2cImpl osg_I2cImpl;
 
+struct osg_I2cConfig;
+typedef struct osg_I2cConfig osg_I2cConfig;
+
 struct osg_I2c;
 typedef struct osg_I2c osg_I2c;
+#endif
 
 // /////////////////////////////////////////////////////////////////////////////
 // SPI
 // /////////////////////////////////////////////////////////////////////////////
-
+#if OSG_USE_SPI == 1
 typedef void (* osg_SpiCallback)(void);
 
 enum osg_SpiMode;
@@ -165,15 +163,28 @@ typedef enum osg_SpiSlaveSelectMode osg_SpiSlaveSelectMode;
 struct osg_Spi;
 typedef struct osg_Spi osg_Spi;
 
+enum osg_SpiFlags;
+typedef enum osg_SpiFlags osg_SpiFlags;
+
+struct osg_SpiConfig;
+typedef struct osg_SpiConfig osg_SpiConfig;
+
+struct osg_SpiImpl;
+typedef struct osg_SpiImpl osg_SpiImpl;
+#endif
+
 // /////////////////////////////////////////////////////////////////////////////
 // UART
 // /////////////////////////////////////////////////////////////////////////////
-
+#if OSG_USE_UART == 1
 enum osg_UartId;
 typedef enum osg_UartId osg_UartId;
 
 enum osg_UartFlags;
 typedef enum osg_UartFlags osg_UartFlags;
+
+struct osg_UartConfig;
+typedef struct osg_UartConfig osg_UartConfig;
 
 struct osg_Uart;
 typedef struct osg_Uart osg_Uart;
@@ -200,6 +211,7 @@ typedef enum osg_UartFlowControl osg_UartFlowControl;
 
 enum osg_UartType;
 typedef enum osg_UartType osg_UartType;
+#endif
 
 #ifdef __cplusplus
 }

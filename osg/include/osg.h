@@ -21,7 +21,7 @@
 
 /// @mainpage osG library
 ///
-/// @section intro_sec Introduction
+/// @section section_intro Introduction
 /// The osG library aims to simplify the firmware programming,
 /// by absrtacting the low-level API into a standard interface.
 /// The advantages are:
@@ -33,13 +33,13 @@
 ///   avoiding to programmers to waste time to understand how the specific board
 ///   works
 ///
-/// @section modules_sec Modules
+/// @section section_modules Modules
 /// There are threee main modules:
 /// * **OSG**: the user-level module. It is the only one that should be used directly by applications.
 /// * **RTOS**: optional internal module, which extends the features by implementing multitasking support
 /// * **Board**: the low-level internal module which wraps the calls to BSP-specific methods
 ///
-/// @section license_sec License
+/// @section section_license License
 ///
 /// osG has a dual license scheme:
 /// * **GPL v3**: the library is freely available under GPL v3 (or newer) license
@@ -47,9 +47,17 @@
 ///   which frees users from GPL restrictions. Please contact <a href="mailto:info@gimasi.ch">GIMASI</a> for pricing
 ///   and information.
 ///
+/// @section section_user_documentation User documentation
+/// Please refer to the Related Pages section for some user-level documentation
 
 /// @defgroup OSG OSG
 /// The user-level API
+
+#ifdef OSG_HAS_CONFIG_FILE
+#include <osgConfig.h>
+#else
+#include "../../templates/osgConfig.h"
+#endif
 
 /// @defgroup Base Base
 /// @ingroup OSG
@@ -64,7 +72,5 @@
 /// @ingroup OSG
 /// Hardware driver classes
 #include "osg/drivers.h"
-
-
 
 #endif

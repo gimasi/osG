@@ -16,47 +16,47 @@
 // osG is also available under a commercial license.
 // Please contact GIMASI at info@gimasi.ch for further information.
 //
-#include "osg/drivers/Gpio.h"
-#include "osg/utils.h"
-#include <board.h>
+#include "../../include/osg/drivers/Gpio.h"
+#include "../../include/osg/utils.h"
+#include "../../../board/include/board.h"
 
-osg_GpioPort osg_gpio_getPort(const osg_GpioId id)
+osg_GpioPort osg_Gpio_getPort(const osg_GpioId id)
 {
-    return (osg_GpioPort) (id / 32);
+    if (id == OSG_GPIO_NONE) return OSG_GPIO_PORT_NONE;
+    return (osg_GpioPort) ((id - 1) / 32 + 1);
 }
 
-osg_GpioPin osg_gpio_getPin(const osg_GpioId id)
+osg_GpioPin osg_Gpio_getPin(const osg_GpioId id)
 {
-    return (osg_GpioPin) (id % 32);
+    if (id == OSG_GPIO_NONE) return OSG_GPIO_PIN_NONE;
+    return (osg_GpioPin) ((id - 1) % 32 + 1);
 }
 
-osg_GpioId osg_gpio_getId(const osg_GpioPort port, const osg_GpioPin pin)
+osg_GpioId osg_Gpio_getId(const osg_GpioPort port, const osg_GpioPin pin)
 {
-    osg_GpioId id = (osg_GpioId) (port * 32 + pin);
+    if (port == OSG_GPIO_PORT_NONE || pin == OSG_GPIO_PIN_NONE) return OSG_GPIO_NONE;
+    osg_GpioId id = (osg_GpioId) ((port - 1) * 32 + pin - 1 + 1);
 
-    osg_assert(osg_board_gpio_checkPin(id), "ASSERT FAILED: Pin unavailable on this board.");
+    osg_assert(osg_board_Gpio_checkPin(id), "ASSERT FAILED: Pin unavailable on this board.");
 
     return id;
 }
 
-void osg_Gpio_ctor(
-    osg_Gpio * self,
-    const osg_GpioId id,
-    const osg_GpioMode mode,
-    const osg_GpioPull pull,
-    const osg_GpioSpeed speed,
-    const osg_GpioAlternateFunction alternate
-    )
+void osg_Gpio_ctor(osg_Gpio * self, const osg_GpioConfig * const config)
 {
-    osg_assert(osg_board_gpio_checkPin(id), "ASSERT FAILED: Pin unavailable on this board.");
-    self->id = id;
-    osg_board_gpio_ctor(self, id, mode, pull, speed, alternate);
-    osg_Gpio_write(self, FALSE);
+    osg_assert(osg_board_Gpio_checkPin(config->id), "ASSERT FAILED: Pin unavailable on this board.");
+    self->id = config->id;
+    self->altFunc = config->alternate;
+    osg_board_Gpio_ctor(self, config);
+    osg_Gpio_write(self, false);
 }
 
 void osg_Gpio_dtor(osg_Gpio * self)
 {
-    osg_board_gpio_dtor(self);
+    if (self == NULL)
+        return;
+
+    osg_board_Gpio_dtor(self);
 }
 
 void * osg_Gpio_getHandler(osg_Gpio * self)
@@ -64,24 +64,24 @@ void * osg_Gpio_getHandler(osg_Gpio * self)
     return self->handler;
 }
 
-Bool osg_Gpio_read(osg_Gpio * self)
+bool osg_Gpio_read(osg_Gpio * self)
 {
-    return osg_board_gpio_read(self);
+    return osg_board_Gpio_read(self);
 }
 
-void osg_Gpio_write(osg_Gpio * self, const Bool value)
+void osg_Gpio_write(osg_Gpio * self, const bool value)
 {
-    osg_board_gpio_write(self, value);
+    osg_board_Gpio_write(self, value);
 }
 
 void osg_Gpio_toggle(osg_Gpio * self)
 {
-    osg_board_gpio_toggle(self);
+    osg_board_Gpio_toggle(self);
 }
 
-Bool osg_Gpio_lock(osg_Gpio * self)
+bool osg_Gpio_lock(osg_Gpio * self)
 {
-    return osg_board_gpio_lock(self);
+    return osg_board_Gpio_lock(self);
 }
 
 void osg_Gpio_setExtInterruptCallback(
@@ -90,5 +90,5 @@ void osg_Gpio_setExtInterruptCallback(
     const osg_IrqPriority preemptionPriority,
     const osg_IrqPriority subPriority)
 {
-    osg_board_gpio_setExtInterruptCallback(id, callback, preemptionPriority, subPriority);
+    osg_board_Gpio_setExtInterruptCallback(id, callback, preemptionPriority, subPriority);
 }

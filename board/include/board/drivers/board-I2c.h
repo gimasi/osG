@@ -34,138 +34,191 @@ extern "C" {
 /// @brief Constructor.
 /// @ingroup Board-I2C
 /// @param self The I2C object.
-/// @param clockSpeed The *master* bus speed.
-/// @param addressingMode The I2C *slave* addressing mode.
-/// @param enableGeneralCall Indicates if the *slave* accepts a General Call.
-/// @param ownAddress I2C *slave* address.
-/// @param circularTxBuffer Optional transmission buffer
-/// @param txBufferSize Transmit buffer size
-/// @param circularRxBuffer Optional receive buffer
-/// @param rxBufferSize Receive buffer size
-void osg_board_I2c_ctor(osg_I2c * self, const uint32_t clockSpeed, const osg_I2cAddressingMode addressingMode, const Bool enableGeneralCall, const uint16_t ownAddress, void * circularTxBuffer, Size txBufferSize, void * circularRxBuffer, Size rxBufferSize);
+/// @param config The config.
+void osg_board_I2c_ctor(
+    osg_I2c * self,
+    const osg_I2cConfig * const config
+    );
+
 /// @brief Destructor.
 /// @ingroup Board-I2C
 /// @param self The I2C object.
 void osg_board_I2c_dtor(osg_I2c * self);
-/// @brief Performs a master send in blocking mode.
+
+/// @brief Register the buffer for buffered .
 /// @ingroup Board-I2C
 /// @param self The I2C object.
-/// @param slaveAddress The I2C slave address of the receiver. Used only if the device is the *master*.
-/// @param buffer A pointer to the message.
-/// @param size The size of the buffer.
-/// @param timeout The amount of time in seconds to wait for transmission.
-/// @return Returns TRUE if the buffer is successful transmitted.
-Bool osg_board_I2c_masterSendBlocking(osg_I2c * self, const uint16_t slaveAddress, const void * buffer, const size_t size, const uint32_t timeout);
-/// @brief Performs a master send in non-blocking mode.
-/// @ingroup Board-I2C
-/// @param self The I2C object.
-/// @param slaveAddress The I2C slave address of the receiver. Used only if the device is the *master*.
-/// @param buffer A pointer to the message.
-/// @param size The size of the buffer.
-/// @return Returns TRUE if the request id successful handled.
-Bool osg_board_I2c_masterSendNonBlocking(osg_I2c * self, const uint16_t slaveAddress, const void * buffer, const size_t size);
-/// @brief Performs a master send in buffered mode.
-/// @ingroup Board-I2C
-/// @param self The I2C object.
-/// @param slaveAddress The I2C slave address of the receiver. Used only if the device is the *master*.
-/// @param buffer A pointer to the message.
-/// @param bufferSize The size of the buffer.
-/// @return Returns TRUE if the request id successful handled.
-Bool osg_board_I2c_masterSendBuffered(osg_I2c * self, const uint16_t slaveAddress, const void * buffer, const Size bufferSize);
-/// @brief Performs a  master receive in blocking mode.
-/// @ingroup Board-I2C
-/// @param self The I2C object.
-/// @param slaveAddress The I2C slave address of the receiver. Used only if the device is the *master*.
-/// @param buffer A pointer to the message.
-/// @param size The size of the buffer.
-/// @param timeout The amount of time in seconds to wait for transmission.
-/// @return Returns TRUE if the buffer is successful transmitted.
-Bool osg_board_I2c_masterReceiveBlocking(osg_I2c * self, const uint16_t slaveAddress, void * buffer, const size_t size, const uint32_t timeout);
-/// @brief Performs a master receive in non-blocking mode.
-/// @ingroup Board-I2C
-/// @param self The I2C object.
-/// @param slaveAddress The I2C slave address of the receiver. Used only if the device is the *master*.
-/// @param buffer A pointer to the message.
-/// @param size The size of the buffer.
-/// @return Returns TRUE if the request id successful handled.
-Bool osg_board_I2c_masterReceiveNonBlocking(osg_I2c * self, const uint16_t slaveAddress, void * buffer, const size_t size);
-/// @brief Performs a master receive inbuffered mode.
-/// @ingroup Board-I2C
-/// @param self The I2C object.
-/// @param buffer A pointer to the message.
-/// @param bufferSize The size of the buffer.
-/// @return Returns TRUE if the request id successful handled.
-Size osg_board_I2c_masterReceiveBuffered(osg_I2c * self, void * buffer, const Size bufferSize);
-/// @brief Performs a slave send in blocking mode.
-/// @ingroup Board-I2C
-/// @param self The I2C object.
-/// @param buffer A pointer to the message.
-/// @param size The size of the buffer.
-/// @param timeout The amount of time in seconds to wait for transmission.
-/// @return Returns TRUE if the buffer is successful transmitted.
-Bool osg_board_I2c_slaveSendBlocking(osg_I2c * self, void * buffer, const size_t size, const uint32_t timeout);
-/// @brief Performs a slave send in non-blocking mode.
-/// @ingroup Board-I2C
-/// @param self The I2C object.
-/// @param buffer A pointer to the message.
-/// @param size The size of the buffer.
-/// @return Returns TRUE if the request id successful handled.
-Bool osg_board_I2c_slaveSendNonBlocking(osg_I2c * self, void * buffer, const size_t size);
-/// @brief Performs a slave send in buffered mode.
-/// @ingroup Board-I2C
-/// @param self The I2C object.
-/// @param buffer A pointer to the message.
-/// @param bufferSize The size of the buffer.
-/// @return Returns TRUE if the request id successful handled.
-Bool osg_board_I2c_slaveSendBuffered(osg_I2c * self, const void * buffer, const Size bufferSize);
-/// @brief Performs a slave receive in blocking mode.
-/// @ingroup Board-I2C
-/// @param self The I2C object.
-/// @param buffer A pointer to the message.
-/// @param size The size of the buffer.
-/// @param timeout The amount of time in seconds to wait for transmission.
-/// @return Returns TRUE if the buffer is successful transmitted.
-Bool osg_board_I2c_slaveReceiveBlocking(osg_I2c * self, void * buffer, const size_t size, const uint32_t timeout);
-/// @brief Performs a slave revceive in non-blocking mode.
-/// @ingroup Board-I2C
-/// @param self The I2C object.
-/// @param buffer A pointer to the message.
-/// @param size The size of the buffer.
-/// @return Returns TRUE if the request id successful handled.
-Bool osg_board_I2c_slaveReceiveNonBlocking(osg_I2c * self, void * buffer, const size_t size);
-/// @brief Performs a slave revceive in buffered mode.
-/// @ingroup Board-I2C
-/// @param self The I2C object.
-/// @param buffer A pointer to the message.
-/// @param bufferSize The size of the buffer.
-/// @return Returns TRUE if the request id successful handled.
-Size osg_board_I2c_slaveReceiveBuffered(osg_I2c * self, void * buffer, const Size bufferSize);
-/// @brief Use this method to start storing data in buffer.
-/// @ingroup Board-I2C
-/// @param self The I2C object.
-/// @param slaveAddress The I2C slave address of the receiver. Used only if the device is the *master*.
-void osg_board_I2c_startReceiveBuffered(osg_I2c * self, const uint16_t slaveAddress);
-/// @brief Use this method to stop storing data in buffer.
-/// @ingroup Board-I2C
-/// @param self The I2C object.
-void osg_board_I2c_stopReceiveBuffered(osg_I2c * self);
-/// @brief Use this method to know whether the buffer is enabled.
-/// @ingroup Board-I2C
-/// @param self The I2C object.
-/// @return TRUE if the buffer is enabled.
-Bool osg_board_I2c_isReceiveBufferedEnabled(osg_I2c * self);
+/// @param circularTxBuffer Optional buffer to be used for implementing the transmission queue
+/// @param txBufferSize Transmission buffer size
+/// @param circularRxBuffer Optional buffer to be used for implementing the receive queue
+/// @param rxBufferSize Receive buffer size
+void osg_board_I2c_setBuffers(osg_I2c * self, void * circularTxBuffer, const Size txBufferSize, void * circularRxBuffer, const Size rxBufferSize);
+
 /// @brief Performs a slave revceive in buffered mode.
 /// @ingroup Board-I2C
 /// @param self The I2C object.
 /// @param tx The callback for successful transmission communication.
 /// @param rx The callback for successful reception communication.
 void osg_board_I2c_setBufferedCallbacks(osg_I2c * self, osg_I2cCallback tx, osg_I2cCallback rx);
+
 /// @brief Performs a slave revceive in buffered mode.
 /// @ingroup Board-I2C
 /// @param self The I2C object.
 /// @param tx The callback for successful transmission communication.
 /// @param rx The callback for successful reception communication.
 void osg_board_I2c_setNbCallbacks(osg_I2c * self, osg_I2cCallback tx, osg_I2cCallback rx);
+
+/// @brief Performs a master send in blocking mode.
+/// @ingroup Board-I2C
+/// @param self The I2C object.
+/// @param slaveAddress The I2C slave address of the receiver. Used only if the device is the *master*. If STM-family board then the slave address is internally left shifted  as requested by STM driver.
+/// @param buffer A pointer to the message.
+/// @param size The size of the buffer.
+/// @param timeout The amount of time in seconds to wait for transmission.
+/// @return Returns true if the buffer is successful transmitted.
+bool osg_board_I2c_masterSendBlocking(osg_I2c * self, const uint16_t slaveAddress, const void * buffer, const size_t size, const uint32_t timeout);
+
+/// @brief Performs a master send in non-blocking mode.
+/// @ingroup Board-I2C
+/// @param self The I2C object.
+/// @param slaveAddress The I2C slave address of the receiver. Used only if the device is the *master*. If STM-family board then the slave address is internally left shifted  as requested by STM driver.
+/// @param buffer A pointer to the message.
+/// @param size The size of the buffer.
+/// @return Returns true if the request id successful handled.
+bool osg_board_I2c_masterSendNonBlocking(osg_I2c * self, const uint16_t slaveAddress, const void * buffer, const size_t size);
+
+
+/// @brief Performs a master send in buffered mode.
+/// @ingroup Board-I2C
+/// @param self The I2C object.
+/// @param slaveAddress The I2C slave address of the receiver. Used only if the device is the *master*. If STM-family board then the slave address is internally left shifted  as requested by STM driver.
+/// @param buffer A pointer to the message.
+/// @param bufferSize The size of the buffer.
+/// @return Returns true if the request id successful handled.
+bool osg_board_I2c_masterSendBuffered(osg_I2c * self, const uint16_t slaveAddress, const void * buffer, const Size bufferSize);
+
+/// @brief Performs a  master receive in blocking mode.
+/// @ingroup Board-I2C
+/// @param self The I2C object.
+/// @param slaveAddress The I2C slave address of the receiver. Used only if the device is the *master*. If STM-family board then the slave address is internally left shifted  as requested by STM driver.
+/// @param buffer A pointer to the message.
+/// @param size The size of the buffer.
+/// @param timeout The amount of time in seconds to wait for transmission.
+/// @return Returns true if the buffer is successful transmitted.
+bool osg_board_I2c_masterReceiveBlocking(osg_I2c * self, const uint16_t slaveAddress, void * buffer, const size_t size, const uint32_t timeout);
+
+/// @brief Performs a master receive in non-blocking mode.
+/// @ingroup Board-I2C
+/// @param self The I2C object.
+/// @param slaveAddress The I2C slave address of the receiver. Used only if the device is the *master*. If STM-family board then the slave address is internally left shifted  as requested by STM driver.
+/// @param buffer A pointer to the message.
+/// @param size The size of the buffer.
+/// @return Returns true if the request id successful handled.
+bool osg_board_I2c_masterReceiveNonBlocking(osg_I2c * self, const uint16_t slaveAddress, void * buffer, const size_t size);
+
+/// @brief Performs a master receive inbuffered mode.
+/// @ingroup Board-I2C
+/// @param self The I2C object.
+/// @param buffer A pointer to the message.
+/// @param bufferSize The size of the buffer.
+/// @return Returns true if the request id successful handled.
+Size osg_board_I2c_masterReceiveBuffered(osg_I2c * self, void * buffer, const Size bufferSize);
+
+/// @brief Performs a slave send in blocking mode.
+/// @ingroup Board-I2C
+/// @param self The I2C object.
+/// @param buffer A pointer to the message.
+/// @param size The size of the buffer.
+/// @param timeout The amount of time in seconds to wait for transmission.
+/// @return Returns true if the buffer is successful transmitted.
+bool osg_board_I2c_slaveSendBlocking(osg_I2c * self, void * buffer, const size_t size, const uint32_t timeout);
+
+/// @brief Performs a slave send in non-blocking mode.
+/// @ingroup Board-I2C
+/// @param self The I2C object.
+/// @param buffer A pointer to the message.
+/// @param size The size of the buffer.
+/// @return Returns true if the request id successful handled.
+bool osg_board_I2c_slaveSendNonBlocking(osg_I2c * self, void * buffer, const size_t size);
+
+/// @brief Performs a slave send in buffered mode.
+/// @ingroup Board-I2C
+/// @param self The I2C object.
+/// @param buffer A pointer to the message.
+/// @param bufferSize The size of the buffer.
+/// @return Returns true if the request id successful handled.
+bool osg_board_I2c_slaveSendBuffered(osg_I2c * self, const void * buffer, const Size bufferSize);
+
+/// @brief Performs a slave receive in blocking mode.
+/// @ingroup Board-I2C
+/// @param self The I2C object.
+/// @param buffer A pointer to the message.
+/// @param size The size of the buffer.
+/// @param timeout The amount of time in seconds to wait for transmission.
+/// @return Returns true if the buffer is successful transmitted.
+bool osg_board_I2c_slaveReceiveBlocking(osg_I2c * self, void * buffer, const size_t size, const uint32_t timeout);
+
+/// @brief Performs a slave revceive in non-blocking mode.
+/// @ingroup Board-I2C
+/// @param self The I2C object.
+/// @param buffer A pointer to the message.
+/// @param size The size of the buffer.
+/// @return Returns true if the request id successful handled.
+bool osg_board_I2c_slaveReceiveNonBlocking(osg_I2c * self, void * buffer, const size_t size);
+
+/// @brief Performs a slave revceive in buffered mode.
+/// @ingroup Board-I2C
+/// @param self The I2C object.
+/// @param buffer A pointer to the message.
+/// @param bufferSize The size of the buffer.
+/// @return Returns true if the request id successful handled.
+Size osg_board_I2c_slaveReceiveBuffered(osg_I2c * self, void * buffer, const Size bufferSize);
+
+/// @brief Use this method to start storing data in buffer.
+/// @ingroup Board-I2C
+/// @param self The I2C object.
+/// @param slaveAddress The I2C slave address of the receiver. Used only if the device is the *master*. If STM-family board then the slave address is internally left shifted  as requested by STM driver.
+void osg_board_I2c_startReceiveBuffered(osg_I2c * self, const uint16_t slaveAddress);
+
+/// @brief Use this method to stop storing data in buffer.
+/// @ingroup Board-I2C
+/// @param self The I2C object.
+void osg_board_I2c_stopReceiveBuffered(osg_I2c * self);
+
+/// @brief Use this method to know whether the buffer is enabled.
+/// @ingroup Board-I2C
+/// @param self The I2C object.
+/// @return true if the buffer is enabled.
+bool osg_board_I2c_isReceiveBufferedEnabled(osg_I2c * self);
+
+/// @brief Use this method to write an I2C register in blocking mode.
+/// @ingroup Board-I2C
+/// @param self The I2C object.
+/// @param slaveAddress The I2C slave address of the receiver. Used only if the device is the *master*. If STM-family board then the slave address is internally left shifted  as requested by STM driver.
+/// @param memAddress The I2C register memory address.
+/// @param memAddrSize The I2C register memory address size.
+/// @param buffer A pointer to the message.
+/// @param size The size of the buffer.
+/// @param timeout The amount of time in seconds to wait for transmission.
+/// @return Returns true if the buffer is successful transmitted.
+bool osg_board_I2c_writeMemBlocking(osg_I2c * self, const uint16_t slaveAddress, const uint16_t memAddress, const uint16_t memAddrSize, void * buffer, const Size size, const uint32_t timeout);
+
+/// @brief Use this method to read an I2C register in blocking mode.
+/// @ingroup Board-I2C
+/// @param self The I2C object.
+/// @param slaveAddress The I2C slave address of the receiver. Used only if the device is the *master*. If STM-family board then the slave address is internally left shifted  as requested by STM driver.
+/// @param memAddress The I2C register memory address.
+/// @param memAddrSize The I2C register memory address size.
+/// @param buffer A pointer to the message.
+/// @param size The size of the buffer.
+/// @param timeout The amount of time in seconds to wait for transmission.
+/// @return Returns true if the buffer is successful transmitted.
+bool osg_board_I2c_readMemBlocking(osg_I2c * self, const uint16_t slaveAddress, const uint16_t memAddress, const uint16_t memAddrSize, void * buffer, const Size size, const uint32_t timeout);
+
+/// @brief Use this method to read an I2C register in blocking mode.
+/// @ingroup Board-I2C
+/// @return Number of I2Cs peripheral on this board.
+uint8_t osg_board_I2c_countI2cs(void);
 
 #ifdef __cplusplus
 }

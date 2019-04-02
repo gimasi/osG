@@ -135,7 +135,7 @@ enum osg_UartParity
 
 enum osg_UartBits;
 typedef enum osg_UartBits osg_UartBits;
-/// @brief UART data bits, without considering possible parity.
+/// @brief UART data bits, considering possible parity bit.
 /// @ingroup UART
 /// @memberof osg_Uart
 enum osg_UartBits
@@ -144,7 +144,8 @@ enum osg_UartBits
     OSG_UART_BITS_6,
     OSG_UART_BITS_7,
     OSG_UART_BITS_8,
-    OSG_UART_BITS_9
+    OSG_UART_BITS_9,
+    OSG_UART_BITS_10
 };
 
 enum osg_UartStopBits;
@@ -183,6 +184,37 @@ enum osg_UartType
     OSG_UART,
     OSG_USART,
     OSG_LPUART
+};
+
+struct osg_UartConfig;
+typedef struct osg_UartConfig osg_UartConfig;
+/// @brief UART configuration.
+/// @ingroup UART
+/// @memberof osg_Uart
+struct osg_UartConfig
+{
+    /// @brief id The UART id of the board.
+    osg_UartId id;
+    /// @brief baud The baud rate
+    osg_UartBaudRate baud;
+    /// @brief parity The parity
+    osg_UartParity parity;
+    /// @brief bits Data bits
+    osg_UartBits bits;
+    /// @brief stopBits Stop bits
+    osg_UartStopBits stopBits;
+    /// @brief flow THe flow control mode
+    osg_UartFlowControl flow;
+    /// @brief txPin Transmission pin
+    osg_GpioId txPin;
+    /// @brief rxPin Receive pin
+    osg_GpioId rxPin;
+    /// @brief ctsPin CTS pin
+    osg_GpioId ctsPin;
+    /// @brief rtsPin RTS pin
+    osg_GpioId rtsPin;
+    /// @brief The alternate function
+    uint16_t alternateFunction;
 };
 
 struct osg_UartImpl;

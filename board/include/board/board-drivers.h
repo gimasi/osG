@@ -20,10 +20,20 @@
 #define OSG_BOARD_DRIVERS_H
 
 #include "drivers/board-Gpio.h"
+#if OSG_USE_LED == 1
 #include "drivers/board-Led.h"
+#endif
+#if OSG_USE_TIMER == 1
 #include "drivers/board-Timer.h"
+#endif
+#if OSG_USE_I2C == 1
 #include "drivers/board-I2c.h"
+#endif
+#if OSG_USE_SPI == 1
 #include "drivers/board-Spi.h"
+#endif
+#if OSG_USE_UART == 1
 #include "drivers/board-Uart.h"
+#endif
 
 #endif

@@ -16,662 +16,26 @@
 // osG is also available under a commercial license.
 // Please contact GIMASI at info@gimasi.ch for further information.
 //
+#include <string.h>
 #include "../../../../include/board/drivers/board-I2c.h"
+#include "board-I2cSupport.h"
 #include "../../../../include/board/drivers/board-Gpio.h"
-#include <osg.h>
-#include <fsl_i2c.h>
-#include <fsl_port.h>
+#include "../../../../../osg/include/osg.h"
 
-#define TOT_I2C FSL_FEATURE_SOC_I2C_COUNT
-
-typedef I2C_Type osg_board_I2cInstance;
-
-struct osg_board_I2cSlaveData;
-typedef struct osg_board_I2cSlaveData osg_board_I2cSlaveData;
-struct osg_board_I2cSlaveData
+void osg_board_I2c_ctor(osg_I2c * self, const osg_I2cConfig * const config)
 {
-    int state;
-    Size dataSize;
-    uint8_t * data;
-};
-
-union osg_board_I2cHandler;
-typedef union osg_board_I2cHandler osg_board_I2cHandler;
-union osg_board_I2cHandler
-{
-    i2c_master_handle_t masterHandle;
-    i2c_slave_handle_t slaveHandle;
-};
-
-static osg_I2cImpl _osg_board_I2c_devices[TOT_I2C];
-static osg_board_I2cHandler _osg_board_I2c_handlers[TOT_I2C];
-static osg_board_I2cSlaveData nbXfer;
-
-static osg_I2cImpl * _osg_board_Uart_getI2cByInstance(void * handler)
-{
-    for (int i = 0; i < TOT_I2C; ++i)
+    if (_osg_board_I2c_checkI2c(self->id) == false)
     {
-        if (_osg_board_I2c_devices[i].handler == handler) return &_osg_board_I2c_devices[i];
+        osg_error("ERROR: I2C port NOT available on this device!");
     }
 
-    return NULL;
-}
-
-static osg_board_I2cHandler * _osg_board_Uart_getI2cHandlerByInstance(void * handler)
-{
-    for (int i = 0; i < TOT_I2C; ++i)
-    {
-        if (_osg_board_I2c_devices[i].handler == handler) return &_osg_board_I2c_handlers[i];
-    }
-
-    return NULL;
-}
-
-Bool _osg_board_I2c_checkI2c(const osg_I2cId i2c)
-{
-    switch (i2c)
-    {
-#ifdef I2C0
-        case OSG_I2C0:
-#endif
-#ifdef I2C1
-        case OSG_I2C1:
-#endif
-#ifdef I2C2
-        case OSG_I2C2:
-#endif
-#ifdef I2C3
-        case OSG_I2C3:
-#endif
-#ifdef I2C4
-        case OSG_I2C4:
-#endif
-            return TRUE;
-        default:
-            return FALSE;
-    }
-}
-
-static uint8_t _osg_board_I2c_getDeviceIndex(const osg_I2cId id)
-{
-    uint8_t index = 0;
-
-#ifdef I2C0
-    if (id == OSG_I2C0)
-        return index;
-    index++;
-#endif
-#ifdef I2C1
-    if (id == OSG_I2C1)
-        return index;
-    index++;
-#endif
-#ifdef I2C2
-    if (id == OSG_I2C2)
-        return index;
-    index++;
-#endif
-#ifdef I2C3
-    if (id == OSG_I2C3)
-        return index;
-    index++;
-#endif
-#ifdef I2C4
-    if (id == OSG_I2C4)
-        return index;
-    index++;
-#endif
-
-    return TOT_I2C;
-}
-
-static osg_I2cImpl * _osg_board_I2c_getI2cById(const osg_I2cId id)
-{
-    uint8_t index = _osg_board_I2c_getDeviceIndex(id);
-    return &_osg_board_I2c_devices[index];
-}
-
-static osg_board_I2cHandler * _osg_board_I2c_getI2cHandler(const osg_I2cId id)
-{
-    uint8_t index = _osg_board_I2c_getDeviceIndex(id);
-    return &_osg_board_I2c_handlers[index];
-}
-
-static void _osg_board_I2c_masterSendCallback(I2C_Type *base, i2c_master_handle_t *handle, status_t status, void *userData);
-static void _osg_board_I2c_masterRecvCallback(I2C_Type *base, i2c_master_handle_t *handle, status_t status, void *userData);
-static void _osg_board_I2c_slaveSendRecvCallback(I2C_Type *base, i2c_slave_transfer_t *xfer, void *userData);
-
-static void _osg_board_I2c_doBufferedSend(osg_I2cImpl * i2c, const osg_I2cMode mode)
-{
-    if (osg_CircularFifo_isEmpty(&i2c->txFifo)) return;
-    const osg_I2cFlags restore = i2c->flags;
-    i2c->flags &= ~OSG_I2C_FLAG_IS_NB_SEND;
-    i2c->flags |= OSG_I2C_FLAG_IS_SEND;
-    void * buffer = NULL;
-    Size size = 0;
-    osg_CircularFifo_getFilledBuffer(&i2c->txFifo, &buffer, &size);
-
-    osg_board_I2cHandler * handle = _osg_board_Uart_getI2cHandlerByInstance(i2c->handler);
-    status_t ok;
-
-    if (mode == OSG_I2C_MASTER_MODE)
-    {
-        i2c_master_transfer_t masterXfer;
-        masterXfer.slaveAddress = i2c->slaveAddress;
-        masterXfer.direction = kI2C_Write;
-        masterXfer.subaddress = 0;
-        masterXfer.subaddressSize = 0;
-        masterXfer.data = (void *)buffer;
-        masterXfer.dataSize = size;
-        masterXfer.flags = kI2C_TransferDefaultFlag;
-
-        I2C_MasterTransferCreateHandle((osg_board_I2cInstance *)i2c->handler,
-                                       &handle->masterHandle,
-                                       _osg_board_I2c_masterSendCallback,
-                                       NULL);
-
-        ok = I2C_MasterTransferNonBlocking((osg_board_I2cInstance *)i2c->handler, &handle->masterHandle, &masterXfer);
-    }
-    else
-    {
-        nbXfer.data = buffer;
-        nbXfer.dataSize = size;
-
-        I2C_SlaveTransferCreateHandle((osg_board_I2cInstance *)i2c->handler,
-                                      &handle->slaveHandle,
-                                      _osg_board_I2c_slaveSendRecvCallback,
-                                      &nbXfer);
-        ok = I2C_SlaveTransferNonBlocking((osg_board_I2cInstance *)i2c->handler, &handle->slaveHandle, kI2C_SlaveAllEvents);
-    }
-
-
-    if (ok != kStatus_Success) i2c->flags = restore;
-}
-
-static void _osg_board_I2c_doBufferedReceive(osg_I2cImpl * i2c, const osg_I2cMode mode)
-{
-    if (osg_CircularFifo_isNull(&i2c->rxFifo)
-            || !(i2c->flags & OSG_I2C_FLAG_RX_BUFF_ENABLED))
-        return;
-    
-    const osg_I2cFlags restore = i2c->flags;
-    i2c->flags &= ~OSG_I2C_FLAG_IS_NB_RECEIVE;
-    i2c->flags |= OSG_I2C_FLAG_IS_RECEIVE;
-
-    osg_board_I2cHandler * handle = _osg_board_Uart_getI2cHandlerByInstance(i2c->handler);
-    status_t ok;
-
-    if (mode == OSG_I2C_MASTER_MODE)
-    {
-        i2c_master_transfer_t masterXfer;
-        masterXfer.slaveAddress = i2c->slaveAddress;
-        masterXfer.direction = kI2C_Read;
-        masterXfer.subaddress = 0;
-        masterXfer.subaddressSize = 0;
-        masterXfer.data = &i2c->rxByte;
-        masterXfer.dataSize = 1;
-        masterXfer.flags = kI2C_TransferDefaultFlag;
-
-        I2C_MasterTransferCreateHandle((osg_board_I2cInstance *)i2c->handler,
-                                       &handle->masterHandle,
-                                       _osg_board_I2c_masterRecvCallback,
-                                       NULL);
-        ok = I2C_MasterTransferNonBlocking((osg_board_I2cInstance *)i2c->handler, &handle->masterHandle, &masterXfer);
-    }
-    else
-    {
-        nbXfer.data = &i2c->rxByte;
-        nbXfer.dataSize = 1;
-
-        I2C_SlaveTransferCreateHandle((osg_board_I2cInstance *)i2c->handler,
-                                      &handle->slaveHandle,
-                                      _osg_board_I2c_slaveSendRecvCallback,
-                                      &nbXfer);
-        ok = I2C_SlaveTransferNonBlocking((osg_board_I2cInstance *)i2c->handler, &handle->slaveHandle, kI2C_SlaveAllEvents);
-    }
-
-    if (ok != kStatus_Success) i2c->flags = restore;
-}
-
-static void _osg_board_I2c_masterSendCallback(I2C_Type *base, i2c_master_handle_t *handle, status_t status, void *userData)
-{
-    osg_I2cImpl * i2c = _osg_board_Uart_getI2cByInstance(base);
-    /* Signal transfer success when received success status. */
-    if (status == kStatus_Success)
-    {
-        if (i2c->flags & OSG_I2C_FLAG_IS_NB_SEND)
-        {
-            i2c->flags &= ~OSG_I2C_FLAG_IS_SEND;
-            if (i2c->txCompleteNb != NULL) i2c->txCompleteNb();
-        }
-        else
-        {
-            osg_CircularFifo_popBytes(&i2c->txFifo, handle->transferSize);
-            if (i2c->txCompleteBuffered != NULL) i2c->txCompleteBuffered();
-        }
-        i2c->flags &= ~OSG_I2C_FLAG_IS_NB_SEND;
-        _osg_board_I2c_doBufferedSend(i2c, OSG_I2C_MASTER_MODE);
-    }
-}
-
-static void _osg_board_I2c_masterRecvCallback(I2C_Type *base, i2c_master_handle_t *handle, status_t status, void *userData)
-{
-    osg_I2cImpl * i2c = _osg_board_Uart_getI2cByInstance(base);
-    /* Signal transfer success when received success status. */
-    if (status == kStatus_Success)
-    {
-        if (i2c->flags & OSG_I2C_FLAG_IS_NB_RECEIVE)
-        {
-            i2c->flags &= ~OSG_I2C_FLAG_IS_RECEIVE;
-            if (i2c->rxCompleteNb != NULL) i2c->rxCompleteNb();
-        }
-        else
-        {
-            osg_CircularFifo_pushBuffer(&i2c->rxFifo, &i2c->rxByte, handle->transferSize);
-            if (i2c->rxCompleteBuffered != NULL) i2c->rxCompleteBuffered();
-        }
-        i2c->flags &= ~OSG_I2C_FLAG_IS_NB_RECEIVE;
-        _osg_board_I2c_doBufferedReceive(i2c, OSG_I2C_MASTER_MODE);
-    }
-}
-
-static void _osg_board_I2c_slaveSendRecvCallback(I2C_Type *base, i2c_slave_transfer_t *xfer, void *userData)
-{
-    osg_I2cImpl * i2c = _osg_board_Uart_getI2cByInstance(base);
-    osg_board_I2cSlaveData * transfer = (osg_board_I2cSlaveData *)userData;
-    
-    switch (xfer->event)
-    {
-        case kI2C_SlaveAddressMatchEvent:
-            xfer->data = transfer->data;
-            xfer->dataSize = transfer->dataSize;
-            break;
-
-        case kI2C_SlaveReceiveEvent:
-            break;
-        
-        case kI2C_SlaveTransmitEvent:
-            break;
-        
-        /*  Transfer done */
-        case kI2C_SlaveCompletionEvent:
-            transfer->state = xfer->completionStatus;
-
-            if (i2c->flags & OSG_I2C_FLAG_IS_RECEIVE)
-            {
-                if (xfer->completionStatus == kStatus_Success)
-                {
-                    if (i2c->flags & OSG_I2C_FLAG_IS_NB_RECEIVE)
-                    {
-                        i2c->flags &= ~OSG_I2C_FLAG_IS_RECEIVE;
-                        if (i2c->rxCompleteNb != NULL) i2c->rxCompleteNb();
-                    }
-                    else
-                    {
-                        osg_CircularFifo_pushBuffer(&i2c->rxFifo, transfer->data, transfer->dataSize);
-                        if (i2c->rxCompleteBuffered != NULL) i2c->rxCompleteBuffered();
-                    }
-                    i2c->flags &= ~OSG_I2C_FLAG_IS_NB_RECEIVE;
-                    _osg_board_I2c_doBufferedReceive(i2c, OSG_I2C_SLAVE_MODE);
-                }
-                else
-                {
-                    osg_error("ERROR: I2C Communication error.");
-                }
-            }
-            
-            if (i2c->flags & OSG_I2C_FLAG_IS_SEND)
-            {
-                xfer->data = NULL;
-                xfer->dataSize = 0;
-                if (xfer->completionStatus == kStatus_Success)
-                {
-                    if (i2c->flags & OSG_I2C_FLAG_IS_NB_SEND)
-                    {
-                        i2c->flags &= ~OSG_I2C_FLAG_IS_SEND;
-                        if (i2c->txCompleteNb != NULL) i2c->txCompleteNb();
-                    }
-                    else
-                    {
-                        osg_CircularFifo_popBytes(&i2c->txFifo, xfer->transferredCount);
-                        if (i2c->txCompleteBuffered != NULL) i2c->txCompleteBuffered();
-                    }
-                    i2c->flags &= ~OSG_I2C_FLAG_IS_NB_SEND;
-                    _osg_board_I2c_doBufferedSend(i2c, OSG_I2C_SLAVE_MODE);
-                }
-                else
-                {
-                    osg_error("ERROR: I2C Communication error.");
-                }
-            }
-            break;
-
-        default:
-            break;
-    }
-}
-
-
-static void _osg_board_I2c_masterBlockingCallback(I2C_Type *base, i2c_master_handle_t *handle, status_t status, void *userData)
-{
-    int * pState = (int *)userData;
-    *pState = status;
-}
-
-static void _osg_board_I2c_slaveBlockingCallback(I2C_Type *base, i2c_slave_transfer_t *xfer, void *userData)
-{
-    osg_board_I2cSlaveData * transfer = (osg_board_I2cSlaveData *)userData;
-    
-    switch (xfer->event)
-    {
-        case kI2C_SlaveAddressMatchEvent:
-            xfer->data = transfer->data;
-            xfer->dataSize = transfer->dataSize;
-            break;
-        
-        case kI2C_SlaveTransmitEvent:
-            break;
-
-        case kI2C_SlaveReceiveEvent:
-            break;
-        
-        case kI2C_SlaveCompletionEvent:
-            xfer->data = NULL;
-            xfer->dataSize = 0;
-            transfer->state = xfer->completionStatus;
-            break;
-        
-        default:
-            break;
-    }   
-}
-
-static void _osg_board_I2c_timeoutCallback(void * argument)
-{
-    int * pState = (int *)argument;
-    *pState = kStatus_I2C_Timeout;
-}
-
-
-
-static osg_board_I2cInstance * _osg_board_I2c_getI2cInstance(const osg_I2cId id)
-{
-    switch (id)
-    {
-#ifdef I2C0
-        case OSG_I2C0:
-            return I2C0;
-#endif
-#ifdef I2C1
-        case OSG_I2C1:
-            return I2C1;
-#endif
-#ifdef I2C2
-        case OSG_I2C2:
-            return I2C2;
-#endif
-#ifdef I2C3
-        case OSG_I2C3:
-            return I2C3;
-#endif
-#ifdef I2C4
-        case OSG_I2C4:
-            return I2C4;
-#endif
-        default:
-            osg_error("ERROR: Invalid I2C port");
-    }
-
-    return NULL;
-}
-
-static uint32_t _osg_board_I2c_getI2cClk(const osg_I2cId id)
-{
-    switch (id)
-    {
-#ifdef I2C0_CLK_SRC
-        case OSG_I2C0:
-            return CLOCK_GetFreq(I2C0_CLK_SRC);
-#endif
-#ifdef I2C1_CLK_SRC
-        case OSG_I2C1:
-            return CLOCK_GetFreq(I2C1_CLK_SRC);
-#endif
-#ifdef I2C2_CLK_SRC
-        case OSG_I2C2:
-            return CLOCK_GetFreq(I2C2_CLK_SRC);
-#endif
-#ifdef I2C3_CLK_SRC
-        case OSG_I2C3:
-            return CLOCK_GetFreq(I2C3_CLK_SRC);
-#endif
-#ifdef I2C4_CLK_SRC
-        case OSG_I2C4:
-            return CLOCK_GetFreq(I2C4_CLK_SRC);
-#endif
-        default:
-            osg_error("ERROR: Invalid I2C port");
-    }
-
-    return (clock_name_t)0;
-}
-
-static Bool _osg_board_I2c_validatePins(const osg_I2cId i2cId, const osg_GpioId sda, const osg_GpioId scl)
-{
-    switch (i2cId)
-    {
-#ifdef I2C0
-        case OSG_I2C0:
-        {
-            if (sda == OSG_GPIO_PE18
-                || sda == OSG_GPIO_PA21
-                || sda == OSG_GPIO_PB1
-                || sda == OSG_GPIO_PB3
-                || sda == OSG_GPIO_PD3
-                || sda == OSG_GPIO_PD9)
-            {
-                if (scl == OSG_GPIO_PE19
-                    || scl == OSG_GPIO_PA20
-                    || scl == OSG_GPIO_PB0
-                    || scl == OSG_GPIO_PB2
-                    || scl == OSG_GPIO_PD2
-                    || scl == OSG_GPIO_PD8)
-                {
-                    return TRUE;
-                }
-            }
-
-            break;
-        }
-#endif
-#ifdef I2C1
-        case OSG_I2C1:
-        {
-            if (sda == OSG_GPIO_PE0
-                || sda == OSG_GPIO_PA9
-                || sda == OSG_GPIO_PC11)
-            {
-                if (scl == OSG_GPIO_PE1
-                    || scl == OSG_GPIO_PA8
-                    || scl == OSG_GPIO_PC10)
-                {
-                    return TRUE;
-                }
-            }
-
-            break;
-        }
-#endif
-#ifdef I2C2
-        case OSG_I2C2:
-        {
-            if (sda == OSG_GPIO_PE22
-                || sda == OSG_GPIO_PA7
-                || sda == OSG_GPIO_PA10
-                || sda == OSG_GPIO_PB11)
-            {
-                if (scl == OSG_GPIO_PE23
-                    || scl == OSG_GPIO_PA6
-                    || scl == OSG_GPIO_PA11
-                    || scl == OSG_GPIO_PB10)
-                {
-                    return TRUE;
-                }
-            }
-
-            break;
-        }
-#endif
-#ifdef I2C3
-        case OSG_I2C3:
-        {
-            if (sda == OSG_GPIO_PE10
-                || sda == OSG_GPIO_PA1
-                || sda == OSG_GPIO_PA30
-                || sda == OSG_GPIO_PC28)
-            {
-                if (scl == OSG_GPIO_PE11
-                    || scl == OSG_GPIO_PA2
-                    || scl == OSG_GPIO_PA31
-                    || scl == OSG_GPIO_PC29)
-                {
-                    return TRUE;
-                }
-            }
-
-            break;
-        }
-#endif
-        default:
-            return FALSE;
-    }
-
-    return FALSE;
-}
-
-osg_GpioAlternateFunction _osg_board_I2c_getGpioAlternateFunction(const osg_I2cId i2cId)
-{
-    switch (i2cId)
-    {
-#ifdef I2C0
-        case OSG_I2C0:
-        {
-            return OSG_GPIO_ALTERNATE_I2C0;
-        }
-#endif
-#ifdef I2C1
-        case OSG_I2C1:
-        {
-            return OSG_GPIO_ALTERNATE_I2C1;
-        }
-#endif
-#ifdef I2C2
-        case OSG_I2C2:
-        {
-            return OSG_GPIO_ALTERNATE_I2C2;
-        }
-#endif
-#ifdef I2C3
-        case OSG_I2C3:
-        {
-            return OSG_GPIO_ALTERNATE_I2C3;
-        }
-#endif
-#ifdef I2C4
-        case OSG_I2C4:
-        {
-            return OSG_GPIO_ALTERNATE_I2C4;
-        }
-#endif
-        default:
-            osg_error("ERROR: Impossible to set correct I2C Alternate Function to Pin.");
-    }
-
-    // suppress warning
-    return OSG_GPIO_ALTERNATE_DEFAULT;
-}
-
-port_mux_t _osg_board_I2c_getPinPortMuxForI2c(const osg_GpioId pin)
-{
-    switch (pin)
-    {
-        case OSG_GPIO_PE0:
-        case OSG_GPIO_PE1:
-            return kPORT_MuxAlt6;
-        case OSG_GPIO_PE10:
-        case OSG_GPIO_PE11:
-        case OSG_GPIO_PE22:
-        case OSG_GPIO_PE23:
-        case OSG_GPIO_PA20:
-        case OSG_GPIO_PA21:
-        case OSG_GPIO_PA6:
-        case OSG_GPIO_PA7:
-        case OSG_GPIO_PA8:
-        case OSG_GPIO_PA9:
-        case OSG_GPIO_PA10:
-        case OSG_GPIO_PA11:
-        case OSG_GPIO_PA30:
-        case OSG_GPIO_PA31:
-        case OSG_GPIO_PB0:
-        case OSG_GPIO_PB1:
-        case OSG_GPIO_PB2:
-        case OSG_GPIO_PB3:
-        case OSG_GPIO_PC10:
-        case OSG_GPIO_PC11:
-        case OSG_GPIO_PC28:
-        case OSG_GPIO_PC29:
-        case OSG_GPIO_PD8:
-        case OSG_GPIO_PD9:
-            return kPORT_MuxAlt2;
-        case OSG_GPIO_PE18:
-        case OSG_GPIO_PE19:
-        case OSG_GPIO_PA1:
-        case OSG_GPIO_PA2:
-        case OSG_GPIO_PB10:
-        case OSG_GPIO_PB11:
-            return kPORT_MuxAlt4;
-        case OSG_GPIO_PD2:
-        case OSG_GPIO_PD3:
-            return kPORT_MuxAlt7;
-        default:
-            osg_error("ERROR: PIN can't be used for I2C.");
-    }
-
-    return kPORT_PinDisabledOrAnalog;
-}
-
-static i2c_slave_address_mode_t _osg_board_I2c_decodeAddressingMode(osg_I2cAddressingMode addrMode)
-{
-    switch (addrMode)
-    {
-        case OSG_I2C_7BIT_ADDRESS:
-            return kI2C_Address7bit;
-        case OSG_I2C_10BIT_ADDRESS:
-            return kI2C_RangeMatch;
-        default:
-            osg_error("ERROR: Invalid addressing mode");
-    }
-
-    // suppress warning
-    return kI2C_Address7bit;
-}
-
-void osg_board_I2c_ctor(osg_I2c * self, const uint32_t clockSpeed, const osg_I2cAddressingMode addressingMode, const Bool enableGeneralCall, const uint16_t ownAddress, void * circularTxBuffer, Size txBufferSize, void * circularRxBuffer, Size rxBufferSize)
-{
-    if (_osg_board_I2c_checkI2c(self->id) == FALSE)
-    {
-        osg_error("I2C port NOT available on this device!");
-    }
-
-    if (_osg_board_I2c_validatePins(self->id, self->sdaPin.id, self->sclPin.id) == FALSE)
+    if (_osg_board_I2c_validatePins(self->id, self->sdaPin.id, self->sclPin.id) == false)
         osg_error("ERROR: Impossible to use these PINs for this I2C port on this board!");
 
     osg_I2cImpl * i2c = _osg_board_I2c_getI2cById(self->id);
     i2c->handler = _osg_board_I2c_getI2cInstance(self->id);
     i2c->flags = OSG_I2C_FLAG_DEFAULT;
 
-    osg_CircularFifo_ctor(&i2c->rxFifo, circularRxBuffer, rxBufferSize, OSG_FIFO_OVERWRITE_NO_ERROR);
-    osg_CircularFifo_ctor(&i2c->txFifo, circularTxBuffer, txBufferSize, OSG_FIFO_ERROR);
 
     if (self->mode == OSG_I2C_MASTER_MODE)
     {
@@ -681,7 +45,7 @@ void osg_board_I2c_ctor(osg_I2c * self, const uint32_t clockSpeed, const osg_I2c
         // masterConfig->glitchFilterWidth = 0U;
         // masterConfig->enableMaster = true;
         I2C_MasterGetDefaultConfig(&masterConfig);
-        masterConfig.baudRate_Bps = clockSpeed;
+        masterConfig.baudRate_Bps = config->clockSpeed;
 
         I2C_MasterInit((osg_board_I2cInstance *)i2c->handler, &masterConfig, _osg_board_I2c_getI2cClk(self->id));
     }
@@ -695,14 +59,24 @@ void osg_board_I2c_ctor(osg_I2c * self, const uint32_t clockSpeed, const osg_I2c
         // slaveConfig->enableSlave = true;
         I2C_SlaveGetDefaultConfig(&slaveConfig);
 
-        slaveConfig.addressingMode = _osg_board_I2c_decodeAddressingMode(addressingMode);
-        if (enableGeneralCall == TRUE)
+        slaveConfig.addressingMode = _osg_board_I2c_decodeAddressingMode(config->addressingMode);
+        if (config->enableGeneralCall == true)
             slaveConfig.enableGeneralCall = true;
-        slaveConfig.slaveAddress = ownAddress;
+        slaveConfig.slaveAddress = config->ownAddress;
         slaveConfig.upperAddress = 0;
 
         I2C_SlaveInit((osg_board_I2cInstance *)i2c->handler, &slaveConfig, _osg_board_I2c_getI2cClk(self->id));
     }
+
+#if I2C_MUTEX_ENABLED
+    osg_Mutex * mutex = _osg_board_I2c_getMutex(self->id);
+    if (mutex->status != OSG_MUTEX_STATUS_CONFIGURED)
+    {
+        _osg_board_I2c_configureMutex(self->id);
+        osg_Mutex_ctor(mutex, OSG_MUTEX_RECURSIVE_ENABLED | OSG_MUTEX_RELEASE_WHEN_THREAD_EXIT, "I2C mutex.");
+        mutex->status = OSG_MUTEX_STATUS_CONFIGURED;
+    }
+#endif
 }
 
 void osg_board_I2c_dtor(osg_I2c * self)
@@ -726,8 +100,48 @@ void osg_board_I2c_dtor(osg_I2c * self)
     i2c->handler = NULL;
 }
 
-Bool osg_board_I2c_masterSendBlocking(osg_I2c * self, const uint16_t slaveAddress, const void * buffer, const size_t size, const uint32_t timeout)
+void osg_board_I2c_setBuffers(osg_I2c * self, void * circularTxBuffer, const Size txBufferSize, void * circularRxBuffer, const Size rxBufferSize)
 {
+    osg_I2cImpl * i2c = _osg_board_I2c_getI2cById(self->id);
+
+    osg_CircularFifoConfig circularConfig;
+    memset(&circularConfig, 0, sizeof(circularConfig));
+
+    circularConfig.buffer = circularRxBuffer;
+    circularConfig.size = rxBufferSize;
+    circularConfig.behavior = OSG_FIFO_OVERWRITE_NO_ERROR;
+    osg_CircularFifo_ctor(&i2c->rxFifo, &circularConfig);
+
+    circularConfig.buffer = circularTxBuffer;
+    circularConfig.size = txBufferSize;
+    circularConfig.behavior = OSG_FIFO_ERROR;
+    osg_CircularFifo_ctor(&i2c->txFifo, &circularConfig);
+}
+
+void osg_board_I2c_setBufferedCallbacks(osg_I2c * self, osg_I2cCallback tx, osg_I2cCallback rx)
+{
+    osg_I2cImpl * i2c = _osg_board_I2c_getI2cById(self->id);
+    i2c->txCompleteBuffered = tx;
+    i2c->rxCompleteBuffered = rx;
+}
+
+void osg_board_I2c_setNbCallbacks(osg_I2c * self, osg_I2cCallback tx, osg_I2cCallback rx)
+{
+    osg_I2cImpl * i2c = _osg_board_I2c_getI2cById(self->id);
+    i2c->txCompleteNb = tx;
+    i2c->rxCompleteNb = rx;
+}
+
+bool osg_board_I2c_masterSendBlocking(osg_I2c * self, const uint16_t slaveAddress, const void * buffer, const size_t size, const uint32_t timeout)
+{
+#if I2C_MUTEX_ENABLED
+    osg_Mutex * mutex = _osg_board_I2c_getMutex(self->id);
+    osg_assert(mutex->status == OSG_MUTEX_STATUS_CONFIGURED, "ASSERT FAILED: I2C mutex is not created.");
+    const bool acq = osg_Mutex_acquire(mutex, 0);
+    if (acq == false)
+        return false;
+#endif
+
     osg_I2cImpl * i2c = _osg_board_I2c_getI2cById(self->id);
     osg_board_I2cHandler * handle = _osg_board_I2c_getI2cHandler(self->id);
     int state = -1;
@@ -741,9 +155,12 @@ Bool osg_board_I2c_masterSendBlocking(osg_I2c * self, const uint16_t slaveAddres
     masterXfer.dataSize = size;
     masterXfer.flags = kI2C_TransferDefaultFlag;
 
-    //const status_t res = I2C_MasterTransferBlocking((osg_board_I2cInstance *)i2c->handler, &masterXfer);
     osg_Timer timer;
-    osg_Timer_ctor(&timer, OSG_TIMER_ONE_SHOT, _osg_board_I2c_timeoutCallback, &state);
+    osg_TimerConfig config;
+    config.type = OSG_TIMER_ONE_SHOT;
+    config.callback = _osg_board_I2c_timeoutCallback;
+    config.argument = &state;
+    osg_Timer_ctor(&timer, &config);
     I2C_MasterTransferCreateHandle((osg_board_I2cInstance *)i2c->handler,
                                    &handle->masterHandle,
                                    _osg_board_I2c_masterBlockingCallback,
@@ -752,33 +169,46 @@ Bool osg_board_I2c_masterSendBlocking(osg_I2c * self, const uint16_t slaveAddres
                                                        &handle->masterHandle,
                                                        &masterXfer);
 
+    bool ret = false;
     if (res != kStatus_Success)
     {
-        osg_Timer_dtor(&timer);
-        return FALSE;
+        ret = false;
     }
-
-    osg_Timer_start(&timer, timeout);
-    while (1)
+    else
     {
-        if (state == kStatus_Success)
+        osg_Timer_start(&timer, timeout);
+        while (true)
         {
-            osg_Timer_stop(&timer);
-            osg_Timer_dtor(&timer);
-            return TRUE;
+            if (state == kStatus_Success)
+            {
+                ret = true;
+                break;
+            }
+
+            if (state == kStatus_I2C_Timeout)
+            {
+                ret = false;
+                break;
+            }
         }
-
-        if (state == kStatus_I2C_Timeout)
-            break;
+        
+        if (ret == false)
+            I2C_SlaveTransferAbort((osg_board_I2cInstance *)i2c->handler, &handle->slaveHandle);
+        
+        osg_Timer_stop(&timer);
     }
-
-    I2C_MasterTransferAbort((osg_board_I2cInstance *)i2c->handler, &handle->masterHandle);
-    osg_Timer_stop(&timer);
+    
     osg_Timer_dtor(&timer);
-    return FALSE;
+
+#if I2C_MUTEX_ENABLED
+    const bool rel = osg_Mutex_release(mutex);
+    osg_assert(rel == true, "ASSERT FAIL: Impossible to release I2C mutex.");
+#endif
+
+    return false;
 }
 
-Bool osg_board_I2c_masterSendNonBlocking(osg_I2c * self, const uint16_t slaveAddress, const void * buffer, const size_t size)
+bool osg_board_I2c_masterSendNonBlocking(osg_I2c * self, const uint16_t slaveAddress, const void * buffer, const size_t size)
 {
     osg_I2cImpl * i2c = _osg_board_I2c_getI2cById(self->id);
     osg_board_I2cHandler * handle = _osg_board_I2c_getI2cHandler(self->id);
@@ -803,7 +233,7 @@ Bool osg_board_I2c_masterSendNonBlocking(osg_I2c * self, const uint16_t slaveAdd
                                                        &handle->masterHandle,
                                                        &masterXfer);
 
-    const Bool ret = res == kStatus_Success ? TRUE : FALSE;
+    const bool ret = osg_bool(res == kStatus_Success);
     if (!ret)
     {
         i2c->flags = restore;
@@ -812,26 +242,34 @@ Bool osg_board_I2c_masterSendNonBlocking(osg_I2c * self, const uint16_t slaveAdd
     return ret;
 }
 
-Bool osg_board_I2c_masterSendBuffered(osg_I2c * self, const uint16_t slaveAddress, const void * buffer, const Size bufferSize)
+bool osg_board_I2c_masterSendBuffered(osg_I2c * self, const uint16_t slaveAddress, const void * buffer, const Size bufferSize)
 {
     osg_I2cImpl * i2c = _osg_board_I2c_getI2cById(self->id);
 
-    if (osg_CircularFifo_isNull(&i2c->txFifo) == TRUE)
-        return FALSE;
+    if (osg_CircularFifo_isNull(&i2c->txFifo) == true)
+        return false;
 
     Size bytesWrote = osg_CircularFifo_pushBuffer(&i2c->txFifo, buffer, bufferSize);
     if (bytesWrote == 0)
-        return FALSE;
+        return false;
 
     i2c->slaveAddress = slaveAddress;
     _osg_board_I2c_doBufferedSend(i2c, self->mode);
 
-    return TRUE;
+    return true;
 }
 
 
-Bool osg_board_I2c_masterReceiveBlocking(osg_I2c * self, const uint16_t slaveAddress, void * buffer, const size_t size, const uint32_t timeout)
+bool osg_board_I2c_masterReceiveBlocking(osg_I2c * self, const uint16_t slaveAddress, void * buffer, const size_t size, const uint32_t timeout)
 {
+#if I2C_MUTEX_ENABLED
+    osg_Mutex * mutex = _osg_board_I2c_getMutex(self->id);
+    osg_assert(mutex->status == OSG_MUTEX_STATUS_CONFIGURED, "ASSERT FAILED: I2C mutex is not created.");
+    const bool acq = osg_Mutex_acquire(mutex, 0);
+    if (acq == false)
+        return false;
+#endif
+
     osg_I2cImpl * i2c = _osg_board_I2c_getI2cById(self->id);
     osg_board_I2cHandler * handle = _osg_board_I2c_getI2cHandler(self->id);
     int state = -1;
@@ -846,7 +284,11 @@ Bool osg_board_I2c_masterReceiveBlocking(osg_I2c * self, const uint16_t slaveAdd
     masterXfer.flags = kI2C_TransferDefaultFlag;
 
     osg_Timer timer;
-    osg_Timer_ctor(&timer, OSG_TIMER_ONE_SHOT, _osg_board_I2c_timeoutCallback, &state);
+    osg_TimerConfig config;
+    config.type = OSG_TIMER_ONE_SHOT;
+    config.callback = _osg_board_I2c_timeoutCallback;
+    config.argument = &state;
+    osg_Timer_ctor(&timer, &config);
     I2C_MasterTransferCreateHandle((osg_board_I2cInstance *)i2c->handler,
                                    &handle->masterHandle,
                                    _osg_board_I2c_masterBlockingCallback,
@@ -855,34 +297,46 @@ Bool osg_board_I2c_masterReceiveBlocking(osg_I2c * self, const uint16_t slaveAdd
                                                        &handle->masterHandle,
                                                        &masterXfer);
 
+    bool ret = false;
     if (res != kStatus_Success)
     {
-        osg_Timer_dtor(&timer);
-        return FALSE;
+        ret = false;
     }
-
-    osg_Timer_start(&timer, timeout);
-    while (1)
+    else
     {
-        if (state == kStatus_Success)
+        osg_Timer_start(&timer, timeout);
+        while (true)
         {
-            osg_Timer_stop(&timer);
-            osg_Timer_dtor(&timer);
-            return TRUE;
+            if (state == kStatus_Success)
+            {
+                ret = true;
+                break;
+            }
+
+            if (state == kStatus_I2C_Timeout)
+            {
+                ret = false;
+                break;
+            }
         }
-
-        if (state == kStatus_I2C_Timeout
-            || state == kStatus_I2C_Nak)
-            break;
+        
+        if (ret == false)
+            I2C_SlaveTransferAbort((osg_board_I2cInstance *)i2c->handler, &handle->slaveHandle);
+        
+        osg_Timer_stop(&timer);
     }
-
-    I2C_MasterTransferAbort((osg_board_I2cInstance *)i2c->handler, &handle->masterHandle);
-    osg_Timer_stop(&timer);
+    
     osg_Timer_dtor(&timer);
-    return FALSE;
+
+#if I2C_MUTEX_ENABLED
+    const bool rel = osg_Mutex_release(mutex);
+    osg_assert(rel == true, "ASSERT FAIL: Impossible to release I2C mutex.");
+#endif
+
+    return false;
 }
 
-Bool osg_board_I2c_masterReceiveNonBlocking(osg_I2c * self, const uint16_t slaveAddress, void * buffer, const size_t size)
+bool osg_board_I2c_masterReceiveNonBlocking(osg_I2c * self, const uint16_t slaveAddress, void * buffer, const size_t size)
 {
     osg_I2cImpl * i2c = _osg_board_I2c_getI2cById(self->id);
     osg_board_I2cHandler * handle = _osg_board_I2c_getI2cHandler(self->id);
@@ -896,7 +350,7 @@ Bool osg_board_I2c_masterReceiveNonBlocking(osg_I2c * self, const uint16_t slave
     masterXfer.dataSize = size;
     masterXfer.flags = kI2C_TransferDefaultFlag;
 
-    if (i2c->flags & OSG_I2C_FLAG_RX_BUFF_ENABLED) return FALSE;
+    if (i2c->flags & OSG_I2C_FLAG_RX_BUFF_ENABLED) return false;
     const osg_I2cFlags restore = i2c->flags;
     i2c->flags |= OSG_I2C_FLAG_IS_NB_RECEIVE | OSG_I2C_FLAG_IS_RECEIVE;
 
@@ -908,7 +362,7 @@ Bool osg_board_I2c_masterReceiveNonBlocking(osg_I2c * self, const uint16_t slave
                                                           &handle->masterHandle,
                                                           &masterXfer);
 
-    const Bool ret = status == kStatus_Success ? TRUE : FALSE;
+    const bool ret = osg_bool(status == kStatus_Success);
     if (!ret)
     {
         i2c->flags = restore;
@@ -920,11 +374,22 @@ Bool osg_board_I2c_masterReceiveNonBlocking(osg_I2c * self, const uint16_t slave
 Size osg_board_I2c_masterReceiveBuffered(osg_I2c * self, void * buffer, const Size bufferSize)
 {
     osg_I2cImpl * i2c = _osg_board_I2c_getI2cById(self->id);
+    if (osg_CircularFifo_isNull(&i2c->rxFifo) == true)
+        return 0;
+
     return osg_CircularFifo_popBuffer(&i2c->rxFifo, buffer, bufferSize);
 }
 
-Bool osg_board_I2c_slaveSendBlocking(osg_I2c * self, void * buffer, const size_t size, const uint32_t timeout)
+bool osg_board_I2c_slaveSendBlocking(osg_I2c * self, void * buffer, const size_t size, const uint32_t timeout)
 {
+#if I2C_MUTEX_ENABLED
+    osg_Mutex * mutex = _osg_board_I2c_getMutex(self->id);
+    osg_assert(mutex->status == OSG_MUTEX_STATUS_CONFIGURED, "ASSERT FAILED: I2C mutex is not created.");
+    const bool acq = osg_Mutex_acquire(mutex, 0);
+    if (acq == false)
+        return false;
+#endif
+
     osg_I2cImpl * i2c = _osg_board_I2c_getI2cById(self->id);
     osg_board_I2cHandler * handle = _osg_board_I2c_getI2cHandler(self->id);
     osg_board_I2cSlaveData transfer;
@@ -933,7 +398,11 @@ Bool osg_board_I2c_slaveSendBlocking(osg_I2c * self, void * buffer, const size_t
     transfer.data = buffer;
 
     osg_Timer timer;
-    osg_Timer_ctor(&timer, OSG_TIMER_ONE_SHOT, _osg_board_I2c_timeoutCallback, &transfer.state);
+    osg_TimerConfig config;
+    config.type = OSG_TIMER_ONE_SHOT;
+    config.callback = _osg_board_I2c_timeoutCallback;
+    config.argument = &transfer.state;
+    osg_Timer_ctor(&timer, &config);
     I2C_SlaveTransferCreateHandle((osg_board_I2cInstance *)i2c->handler,
                                   &handle->slaveHandle,
                                   _osg_board_I2c_slaveBlockingCallback,
@@ -942,44 +411,57 @@ Bool osg_board_I2c_slaveSendBlocking(osg_I2c * self, void * buffer, const size_t
                                                       &handle->slaveHandle,
                                                       kI2C_SlaveAllEvents);
 
+    bool ret = false;
     if (res != kStatus_Success)
     {
-        osg_Timer_dtor(&timer);
-        return FALSE;
+        ret = false;
     }
-
-    Bool ret = FALSE;
-    osg_Timer_start(&timer, timeout);
-    while (1)
+    else
     {
-        if (transfer.state == kStatus_Success)
+        osg_Timer_start(&timer, timeout);
+        while (true)
         {
-            ret = TRUE;
-            break;
+            if (transfer.state == kStatus_Success)
+            {
+                ret = true;
+                break;
+            }
+
+            if (transfer.state == kStatus_I2C_Timeout)
+            {
+                ret = false;
+                break;
+            }
         }
-
-        if (transfer.state == kStatus_I2C_Timeout
-            ||  transfer.state == kStatus_I2C_Nak)
-            break;
+        
+        if (ret == false)
+            I2C_SlaveTransferAbort((osg_board_I2cInstance *)i2c->handler, &handle->slaveHandle);
+        
+        osg_Timer_stop(&timer);
     }
-
-    I2C_SlaveTransferAbort((osg_board_I2cInstance *)i2c->handler, &handle->slaveHandle);
-    osg_Timer_stop(&timer);
+    
     osg_Timer_dtor(&timer);
+
+#if I2C_MUTEX_ENABLED
+    const bool rel = osg_Mutex_release(mutex);
+    osg_assert(rel == true, "ASSERT FAIL: Impossible to release I2C mutex.");
+#endif
+
     return ret;
 }
 
-Bool osg_board_I2c_slaveSendNonBlocking(osg_I2c * self, void * buffer, const size_t size)
+bool osg_board_I2c_slaveSendNonBlocking(osg_I2c * self, void * buffer, const size_t size)
 {
     osg_I2cImpl * i2c = _osg_board_I2c_getI2cById(self->id);
     osg_board_I2cHandler * handle = _osg_board_I2c_getI2cHandler(self->id);
 
     const osg_I2cFlags restore = i2c->flags;
     i2c->flags |= OSG_I2C_FLAG_IS_NB_SEND | OSG_I2C_FLAG_IS_SEND;
-    
-    nbXfer.state = -1;
-    nbXfer.dataSize = size;
-    nbXfer.data = buffer;
+
+    osg_board_I2cSlaveData * nbXfer = _osg_board_I2c_getNonBlockingTransferSlaveData();
+    nbXfer->state = -1;
+    nbXfer->dataSize = size;
+    nbXfer->data = buffer;
 
     I2C_SlaveTransferCreateHandle((osg_board_I2cInstance *)i2c->handler,
                                   &handle->slaveHandle,
@@ -989,7 +471,7 @@ Bool osg_board_I2c_slaveSendNonBlocking(osg_I2c * self, void * buffer, const siz
                                                       &handle->slaveHandle,
                                                       kI2C_SlaveAllEvents);
 
-    const Bool ret = res == kStatus_Success ? TRUE : FALSE;
+    const bool ret = osg_bool(res == kStatus_Success);
     if (!ret)
     {
         i2c->flags = restore;
@@ -998,26 +480,34 @@ Bool osg_board_I2c_slaveSendNonBlocking(osg_I2c * self, void * buffer, const siz
     return ret;
 }
 
-Bool osg_board_I2c_slaveSendBuffered(osg_I2c * self, const void * buffer, const Size bufferSize)
+bool osg_board_I2c_slaveSendBuffered(osg_I2c * self, const void * buffer, const Size bufferSize)
 {
     osg_I2cImpl * i2c = _osg_board_I2c_getI2cById(self->id);
 
-    if (osg_CircularFifo_isNull(&i2c->txFifo) == TRUE)
-        return FALSE;
+    if (osg_CircularFifo_isNull(&i2c->txFifo) == true)
+        return false;
 
     Size bytesWrote = osg_CircularFifo_pushBuffer(&i2c->txFifo, buffer, bufferSize);
     if (bytesWrote == 0)
-        return FALSE;
+        return false;
 
     _osg_board_I2c_doBufferedSend(i2c, self->mode);
 
-    return TRUE;
+    return true;
 }
 
-Bool osg_board_I2c_slaveReceiveBlocking(osg_I2c * self, void * buffer, const size_t size, const uint32_t timeout)
+bool osg_board_I2c_slaveReceiveBlocking(osg_I2c * self, void * buffer, const size_t size, const uint32_t timeout)
 {
+#if I2C_MUTEX_ENABLED
+    osg_Mutex * mutex = _osg_board_I2c_getMutex(self->id);
+    osg_assert(mutex->status == OSG_MUTEX_STATUS_CONFIGURED, "ASSERT FAILED: I2C mutex is not created.");
+    const bool acq = osg_Mutex_acquire(mutex, 0);
+    if (acq == false)
+        return false;
+#endif
+
     osg_I2cImpl * i2c = _osg_board_I2c_getI2cById(self->id);
-    if (i2c->flags & OSG_I2C_FLAG_RX_BUFF_ENABLED) return FALSE;
+    if (i2c->flags & OSG_I2C_FLAG_RX_BUFF_ENABLED) return false;
     osg_board_I2cHandler * handle = _osg_board_I2c_getI2cHandler(self->id);
     osg_board_I2cSlaveData transfer;
     transfer.state = -1;
@@ -1025,7 +515,11 @@ Bool osg_board_I2c_slaveReceiveBlocking(osg_I2c * self, void * buffer, const siz
     transfer.data = buffer;
 
     osg_Timer timer;
-    osg_Timer_ctor(&timer, OSG_TIMER_ONE_SHOT, _osg_board_I2c_timeoutCallback, &transfer.state);
+    osg_TimerConfig config;
+    config.type = OSG_TIMER_ONE_SHOT;
+    config.callback = _osg_board_I2c_timeoutCallback;
+    config.argument = &transfer.state;
+    osg_Timer_ctor(&timer, &config);
     i2c->flags &= ~OSG_I2C_FLAG_HANDLE_CREATED;
     I2C_SlaveTransferCreateHandle((osg_board_I2cInstance *)i2c->handler,
                                   &handle->slaveHandle,
@@ -1035,44 +529,58 @@ Bool osg_board_I2c_slaveReceiveBlocking(osg_I2c * self, void * buffer, const siz
                                                       &handle->slaveHandle,
                                                       kI2C_SlaveAllEvents);
 
+    bool ret = false;
     if (res != kStatus_Success)
     {
-        osg_Timer_dtor(&timer);
-        return FALSE;
+        ret = false;
     }
-
-    Bool ret = FALSE;
-    osg_Timer_start(&timer, timeout);
-    while (1)
+    else
     {
-        if (transfer.state == kStatus_Success)
+        osg_Timer_start(&timer, timeout);
+        while (true)
         {
-            ret = TRUE;
-            break;
+            if (transfer.state == kStatus_Success)
+            {
+                ret = true;
+                break;
+            }
+
+            if (transfer.state == kStatus_I2C_Timeout)
+            {
+                ret = false;
+                break;
+            }
         }
-
-        if (transfer.state == kStatus_I2C_Timeout)
-            break;
+        
+        if (ret == false)
+            I2C_SlaveTransferAbort((osg_board_I2cInstance *)i2c->handler, &handle->slaveHandle);
+        
+        osg_Timer_stop(&timer);
     }
-
-    I2C_SlaveTransferAbort((osg_board_I2cInstance *)i2c->handler, &handle->slaveHandle);
-    osg_Timer_stop(&timer);
+    
     osg_Timer_dtor(&timer);
+
+#if I2C_MUTEX_ENABLED
+    const bool rel = osg_Mutex_release(mutex);
+    osg_assert(rel == true, "ASSERT FAIL: Impossible to release I2C mutex.");
+#endif
+
     return ret;
 }
 
-Bool osg_board_I2c_slaveReceiveNonBlocking(osg_I2c * self, void * buffer, const size_t size)
+bool osg_board_I2c_slaveReceiveNonBlocking(osg_I2c * self, void * buffer, const size_t size)
 {
     osg_I2cImpl * i2c = _osg_board_I2c_getI2cById(self->id);
     osg_board_I2cHandler * handle = _osg_board_I2c_getI2cHandler(self->id);
 
-    if (i2c->flags & OSG_I2C_FLAG_RX_BUFF_ENABLED) return FALSE;
+    if (i2c->flags & OSG_I2C_FLAG_RX_BUFF_ENABLED) return false;
     const osg_I2cFlags restore = i2c->flags;
     i2c->flags |= OSG_I2C_FLAG_IS_NB_RECEIVE | OSG_I2C_FLAG_IS_RECEIVE;
 
-    nbXfer.state = -1;
-    nbXfer.dataSize = size;
-    nbXfer.data = buffer;
+    osg_board_I2cSlaveData * nbXfer = _osg_board_I2c_getNonBlockingTransferSlaveData();
+    nbXfer->state = -1;
+    nbXfer->dataSize = size;
+    nbXfer->data = buffer;
 
     I2C_SlaveTransferCreateHandle((osg_board_I2cInstance *)i2c->handler,
                                   &handle->slaveHandle,
@@ -1082,7 +590,7 @@ Bool osg_board_I2c_slaveReceiveNonBlocking(osg_I2c * self, void * buffer, const 
                                                       &handle->slaveHandle,
                                                       kI2C_SlaveAllEvents);
 
-    const Bool ret = res == kStatus_Success ? TRUE : FALSE;
+    const bool ret = osg_bool(res == kStatus_Success);
     if (!ret)
     {
         i2c->flags = restore;
@@ -1094,28 +602,17 @@ Bool osg_board_I2c_slaveReceiveNonBlocking(osg_I2c * self, void * buffer, const 
 Size osg_board_I2c_slaveReceiveBuffered(osg_I2c * self, void * buffer, const Size bufferSize)
 {
     osg_I2cImpl * i2c = _osg_board_I2c_getI2cById(self->id);
+    if (osg_CircularFifo_isNull(&i2c->rxFifo) == true)
+        return 0;
+
     return osg_CircularFifo_popBuffer(&i2c->rxFifo, buffer, bufferSize);
-}
-
-void osg_board_I2c_setBufferedCallbacks(osg_I2c * self, osg_I2cCallback tx, osg_I2cCallback rx)
-{
-    osg_I2cImpl * i2c = _osg_board_I2c_getI2cById(self->id);
-    i2c->txCompleteBuffered = tx;
-    i2c->rxCompleteBuffered = rx;
-}
-
-void osg_board_I2c_setNbCallbacks(osg_I2c * self, osg_I2cCallback tx, osg_I2cCallback rx)
-{
-    osg_I2cImpl * i2c = _osg_board_I2c_getI2cById(self->id);
-    i2c->txCompleteNb = tx;
-    i2c->rxCompleteNb = rx;
 }
 
 void osg_board_I2c_startReceiveBuffered(osg_I2c * self, const uint16_t slaveAddress)
 {
     osg_I2cImpl * i2c = _osg_board_I2c_getI2cById(self->id);
-    osg_assert(osg_CircularFifo_isNull(&i2c->rxFifo) == FALSE, "ASSERT FAILED: Tx Buffer is NULL");
-        
+    osg_assert(osg_CircularFifo_isNull(&i2c->rxFifo) == false, "ASSERT FAILED: I2C Rx Buffer is NULL");
+
     i2c->flags |= OSG_I2C_FLAG_RX_BUFF_ENABLED | OSG_I2C_FLAG_IS_RECEIVE;
     if (self->mode == OSG_I2C_MASTER_MODE)
         i2c->slaveAddress = slaveAddress;
@@ -1125,6 +622,7 @@ void osg_board_I2c_startReceiveBuffered(osg_I2c * self, const uint16_t slaveAddr
 void osg_board_I2c_stopReceiveBuffered(osg_I2c * self)
 {
     osg_I2cImpl * i2c = _osg_board_I2c_getI2cById(self->id);
+    osg_assert(osg_CircularFifo_isNull(&i2c->rxFifo) == false, "ASSERT FAILED: I2C Rx Buffer is NULL");
     osg_board_I2cHandler * handle = _osg_board_I2c_getI2cHandler(self->id);
 
     if (i2c->flags & OSG_I2C_FLAG_RX_BUFF_ENABLED)
@@ -1141,10 +639,98 @@ void osg_board_I2c_stopReceiveBuffered(osg_I2c * self)
     osg_CircularFifo_clear(&i2c->rxFifo);
 }
 
-Bool osg_board_I2c_isReceiveBufferedEnabled(osg_I2c * self)
+bool osg_board_I2c_isReceiveBufferedEnabled(osg_I2c * self)
 {
-    if (_osg_board_I2c_getI2cById(self->id)->flags & OSG_I2C_FLAG_RX_BUFF_ENABLED)
-        return TRUE;
+    return osg_bool(_osg_board_I2c_getI2cById(self->id)->flags & OSG_I2C_FLAG_RX_BUFF_ENABLED);
+}
 
-    return FALSE;
+bool osg_board_I2c_writeMemBlocking(osg_I2c * self, const uint16_t slaveAddress, const uint16_t memAddress, const uint16_t memAddrSize, void * buffer, const Size size, const uint32_t timeout)
+{
+#if I2C_MUTEX_ENABLED
+    osg_Mutex * mutex = _osg_board_I2c_getMutex(self->id);
+    osg_assert(mutex->status == OSG_MUTEX_STATUS_CONFIGURED, "ASSERT FAILED: I2C mutex is not created.");
+    const bool acq = osg_Mutex_acquire(mutex, 0);
+    if (acq == false)
+        return false;
+#endif
+
+    osg_I2cImpl * i2c = _osg_board_I2c_getI2cById(self->id);
+
+    // start, address and W
+    status_t ret = I2C_MasterStart((osg_board_I2cInstance *)i2c->handler, (uint8_t)slaveAddress, kI2C_Write);
+    if (ret != kStatus_Success)
+        return false;
+
+    // write memory address
+    ret = I2C_MasterWriteBlocking((osg_board_I2cInstance *)i2c->handler, (uint8_t *)memAddress, (Size)memAddrSize, kI2C_TransferNoStopFlag);
+    if (ret != kStatus_Success)
+        return false;
+
+    // restart, address and W
+    ret = I2C_MasterRepeatedStart((osg_board_I2cInstance *)i2c->handler, (uint8_t)slaveAddress, kI2C_Write);
+    if (ret != kStatus_Success)
+        return false;
+
+    // write data
+    ret = I2C_MasterWriteBlocking((osg_board_I2cInstance *)i2c->handler, (uint8_t *)buffer, size, kI2C_TransferDefaultFlag);
+    //if (ret != kStatus_Success)
+    //    return false;
+
+    // stop. USEFUL?
+    //ret = I2C_MasterStop((osg_board_I2cInstance *)i2c->handler);
+
+#if I2C_MUTEX_ENABLED
+    const bool rel = osg_Mutex_release(mutex);
+    osg_assert(rel == true, "ASSERT FAIL: Impossible to release I2C mutex.");
+#endif
+
+    return osg_bool(ret == kStatus_Success);
+}
+
+bool osg_board_I2c_readMemBlocking(osg_I2c * self, const uint16_t slaveAddress, const uint16_t memAddress, const uint16_t memAddrSize, void * buffer, const Size size, const uint32_t timeout)
+{
+#if I2C_MUTEX_ENABLED
+    osg_Mutex * mutex = _osg_board_I2c_getMutex(self->id);
+    osg_assert(mutex->status == OSG_MUTEX_STATUS_CONFIGURED, "ASSERT FAILED: I2C mutex is not created.");
+    const bool acq = osg_Mutex_acquire(mutex, 0);
+    if (acq == false)
+        return false;
+#endif
+
+    osg_I2cImpl * i2c = _osg_board_I2c_getI2cById(self->id);
+
+    // start, address and W
+    status_t ret = I2C_MasterStart((osg_board_I2cInstance *)i2c->handler, (uint8_t)slaveAddress, kI2C_Write);
+    if (ret != kStatus_Success)
+        return false;
+
+    // write memory address
+    ret = I2C_MasterWriteBlocking((osg_board_I2cInstance *)i2c->handler, (uint8_t *)memAddress, (Size)memAddrSize, kI2C_TransferNoStopFlag);
+    if (ret != kStatus_Success)
+        return false;
+
+    // restart, address and R
+    ret = I2C_MasterRepeatedStart((osg_board_I2cInstance *)i2c->handler, (uint8_t)slaveAddress, kI2C_Read);
+    if (ret != kStatus_Success)
+        return false;
+
+    // read data
+    ret = I2C_MasterReadBlocking((osg_board_I2cInstance *)i2c->handler, (uint8_t *)buffer, size, kI2C_TransferDefaultFlag);
+    //if (ret != kStatus_Success)
+    //    return false;
+
+    // stop. USEFUL?
+    //ret = I2C_MasterStop((osg_board_I2cInstance *)i2c->handler);
+
+#if I2C_MUTEX_ENABLED
+    const bool rel = osg_Mutex_release(mutex);
+    osg_assert(rel == true, "ASSERT FAIL: Impossible to release I2C mutex.");
+#endif
+
+    return osg_bool(ret == kStatus_Success);
+}
+
+uint8_t osg_board_I2c_countI2cs()
+{
+    return _osg_board_I2c_getI2cs();
 }

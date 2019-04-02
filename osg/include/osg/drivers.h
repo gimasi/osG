@@ -20,11 +20,37 @@
 #define OSG_DRIVERS_H
 
 #include "drivers/Gpio.h"
-#include "drivers/Led.h"
-#include "drivers/Thread.h"
-#include "drivers/Timer.h"
+
+#if OSG_USE_I2C == 1
 #include "drivers/I2c.h"
+#endif
+
+#if OSG_USE_LED == 1
+#include "drivers/Led.h"
+#endif
+
+#if OSG_OS_USE_MESSAGES == 1
+#include "drivers/MessageQueue.h"
+#endif
+
+#if OSG_OS_USE_MUTEX == 1
+#include "drivers/Mutex.h"
+#endif
+
+#if OSG_USE_SPI == 1
 #include "drivers/Spi.h"
+#endif
+
+#if OSG_OS_USE_THREAD == 1
+#include "drivers/Thread.h"
+#endif
+
+#if (OSG_USE_TIMER == 1) || (OSG_OS_USE_TIMER == 1)
+#include "drivers/Timer.h"
+#endif
+
+#if OSG_USE_UART == 1
 #include "drivers/Uart.h"
+#endif
 
 #endif

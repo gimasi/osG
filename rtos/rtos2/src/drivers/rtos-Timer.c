@@ -16,9 +16,16 @@
 // osG is also available under a commercial license.
 // Please contact GIMASI at info@gimasi.ch for further information.
 //
-#include "rtos/drivers/rtos-Timer.h"
-#include "rtos-config.h"
-#include <osg.h>
+#include "../../../include/rtos/drivers/rtos-Timer.h"
+#include "../../include/rtos/rtos-config.h"
+#include "../../../../osg/include/osg.h"
+
+static osTimerAttr_t _oneShot = {
+    .name = "0-OSG_TIMER"
+};
+static osTimerAttr_t _periodic = {
+    .name = "1-OSG_TIMER"
+};
 
 static osTimerType_t _osg_rtos_timer_getTimerType(const osg_TimerType osgType)
 {
@@ -34,49 +41,55 @@ static osTimerType_t _osg_rtos_timer_getTimerType(const osg_TimerType osgType)
     return osTimerOnce;
 }
 
-void osg_rtos_Timer_ctor(osg_Timer * self, const osg_TimerType type, osg_TimerCallback callback, void * argument)
+void osg_rtos_Timer_ctor(osg_Timer * self, const osg_TimerConfig * const config)
 {
-    osTimerAttr_t attr;
-    if (type == OSG_TIMER_ONE_SHOT)
+    if (self == NULL)
+        return;
+
+    osTimerAttr_t * attr;
+    if (config->type == OSG_TIMER_ONE_SHOT)
     {
-        attr.name = "0-OSG_TIMER";
+        attr = &_oneShot;
     }
     else
     {
-        attr.name = "1-OSG_TIMER";
+        attr = &_periodic;
     }
-    self->handler = osTimerNew(callback, _osg_rtos_timer_getTimerType(type), argument, &attr);
+    self->handler = osTimerNew(config->callback, _osg_rtos_timer_getTimerType(config->type), config->argument, attr);
     osg_assert(self->handler != NULL, "ERROR: Cannot initialize timer.");
 }
 
 void osg_rtos_Timer_dtor(osg_Timer * self)
 {
+    if (self == NULL || self-> handler == NULL)
+        return;
+
     osTimerDelete((osTimerId_t)self->handler);
     self->handler = NULL;
 }
 
-Bool osg_rtos_Timer_start(osg_Timer * self, const uint32_t millis)
+bool osg_rtos_Timer_start(osg_Timer * self, const uint32_t millis)
 {
-    if (osTimerStart((osTimerId_t)self->handler, millis) == osOK)
-        return TRUE;
+    if (self == NULL || self-> handler == NULL)
+        return false;
 
-    return FALSE;
+    return osg_bool(osTimerStart((osTimerId_t)self->handler, millis) == osOK);
 }
 
-Bool osg_rtos_Timer_stop(osg_Timer * self)
+bool osg_rtos_Timer_stop(osg_Timer * self)
 {
-    if (osTimerStop((osTimerId_t)self->handler) == osOK)
-        return TRUE;
+    if (self == NULL || self-> handler == NULL)
+        return false;
 
-    return FALSE;
+    return osg_bool(osTimerStop((osTimerId_t)self->handler) == osOK);
 }
 
-Bool osg_rtos_Timer_isRunning(osg_Timer * self)
+bool osg_rtos_Timer_isRunning(osg_Timer * self)
 {
-    if (osTimerIsRunning((osTimerId_t)self->handler) == 1)
-        return TRUE;
+    if (self == NULL || self-> handler == NULL)
+        return false;
 
-    return FALSE;
+    return osg_bool(osTimerIsRunning((osTimerId_t)self->handler) == 1);
 }
 
 osg_TimerType osg_rtos_Timer_getType(osg_Timer * self)

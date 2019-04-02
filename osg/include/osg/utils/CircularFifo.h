@@ -53,6 +53,23 @@ enum osg_CircularFifoBehavior
     OSG_FIFO_FILL
 };
 
+struct osg_CircularFifoConfig;
+typedef struct osg_CircularFifoConfig osg_CircularFifoConfig;
+
+/// @brief The CircularFifo config struct.
+/// @ingroup CircularFifo
+/// @memberof osg_CircularFifo
+struct osg_CircularFifoConfig
+{
+    /// @brief The FIFO insertion behavior
+    osg_CircularFifoBehavior behavior;
+    /// @brief The internal buffer
+    Byte * buffer;
+    /// @brief The internal buffer size
+    Size size;
+};
+
+
 struct osg_CircularFifo;
 typedef struct osg_CircularFifo osg_CircularFifo;
 
@@ -62,21 +79,15 @@ typedef struct osg_CircularFifo osg_CircularFifo;
 /// @memberof osg_CircularFifo
 struct osg_CircularFifo
 {
-    /// @brief The internal buffer
+    /// @brief The fifo config
     /// @private
-    Byte * buffer;
-    /// @brief The internal buffer size
-    /// @private
-    Size size;
+    osg_CircularFifoConfig config;
     /// @brief The first available index for reading
     /// @private
     Size readPosition;
     /// @brief The first available index for writing
     /// @private
     Size writePosition;
-    /// @brief The FIFO insertion behavior
-    /// @private
-    osg_CircularFifoBehavior behavior;
     /// @brief Tracks current data size.
     /// @private
     Size currentSize;
@@ -88,13 +99,9 @@ struct osg_CircularFifo
 /// @ingroup CircularFifo
 /// @memberof osg_CircularFifo
 /// @param self The object.
-/// @param buffer The buffer
-/// @param size The buffer size
-/// @param behavior The preferred behavior in case of data insertion.
+/// @param config The configuration
 void osg_CircularFifo_ctor(osg_CircularFifo * self,
-                           void * buffer,
-                           const Size size,
-                           const osg_CircularFifoBehavior behavior);
+                           const osg_CircularFifoConfig * const config);
 /// @brief Destructor.
 /// @ingroup CircularFifo
 /// @memberof osg_CircularFifo
@@ -105,19 +112,19 @@ void osg_CircularFifo_dtor(osg_CircularFifo * self);
 /// @memberof osg_CircularFifo
 /// @param self The object.
 /// @return True if empty.
-Bool osg_CircularFifo_isEmpty(const osg_CircularFifo * self);
+bool osg_CircularFifo_isEmpty(const osg_CircularFifo * self);
 /// @brief Checks whether the FIFO is full
 /// @ingroup CircularFifo
 /// @memberof osg_CircularFifo
 /// @param self The object.
 /// @return True if full.
-Bool osg_CircularFifo_isFull(const osg_CircularFifo * self);
+bool osg_CircularFifo_isFull(const osg_CircularFifo * self);
 /// @brief Checks whether the FIFO buffer is not initialized.
 /// @ingroup CircularFifo
 /// @memberof osg_CircularFifo
 /// @param self The object.
-/// @return TRUE whether the buffer is NULL.
-Bool osg_CircularFifo_isNull(const osg_CircularFifo * self);
+/// @return true whether the buffer is NULL.
+bool osg_CircularFifo_isNull(const osg_CircularFifo * self);
 /// @brief Gets the number of currently stored bytes
 /// @ingroup CircularFifo
 /// @memberof osg_CircularFifo
@@ -136,15 +143,15 @@ void osg_CircularFifo_clear(osg_CircularFifo * self);
 /// @memberof osg_CircularFifo
 /// @param self The object.
 /// @param byte The byte to be inserted
-/// @return TRUE in case of successful insertion
-Bool osg_CircularFifo_pushByte(osg_CircularFifo * self, const Byte byte);
+/// @return true in case of successful insertion
+bool osg_CircularFifo_pushByte(osg_CircularFifo * self, const Byte byte);
 /// @brief Extracts a byte from the FIFO
 /// @ingroup CircularFifo
 /// @memberof osg_CircularFifo
 /// @param self The object.
 /// @param byte Where to store the extracted byte
-/// @return TRUE in case of successful extraction
-Bool osg_CircularFifo_popByte(osg_CircularFifo * self, Byte * byte);
+/// @return true in case of successful extraction
+bool osg_CircularFifo_popByte(osg_CircularFifo * self, Byte * byte);
 /// @brief Inserts a buffer into the FIFO
 /// @ingroup CircularFifo
 /// @memberof osg_CircularFifo

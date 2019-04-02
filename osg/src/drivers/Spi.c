@@ -16,42 +16,45 @@
 // osG is also available under a commercial license.
 // Please contact GIMASI at info@gimasi.ch for further information.
 //
-#include "osg/drivers/Spi.h"
-#include "osg/drivers/Gpio.h"
-#include "osg/utils.h"
-#include <board.h>
+#include <string.h>
+#include "../../include/osg/drivers/Spi.h"
+#include "../../include/osg/drivers/Gpio.h"
+#include "../../include/osg/utils.h"
+#include "../../../board/include/board.h"
 
-osg_GpioAlternateFunction _osg_board_spi_getGpioAlternateFunction(const osg_SpiId spiId);
-
-void osg_Spi_ctor(osg_Spi * self, osg_SpiId id, osg_SpiMode mode, uint32_t clockSpeed, osg_SpiPolarity polarity, osg_SpiPhase phase, osg_SpiEndianess endianess, osg_SpiDataSize dataSize, osg_SpiSlaveSelectMode ssMode, osg_GpioId sclkPin, osg_GpioId mosiPin, osg_GpioId misoPin, osg_GpioId * ssPinList, Size ssPinListSize, void * circularTxBuffer, Size txBufferSize, void * circularRxBuffer, Size rxBufferSize)
+void osg_Spi_ctor(osg_Spi * self, const osg_SpiConfig * const config)
 {
-    osg_assert(osg_board_gpio_checkPin(sclkPin) == TRUE, "ASSERT FAILED: SPI SCLK Pin is NOT available on this board. Please check the data sheet.");
-    osg_assert(osg_board_gpio_checkPin(mosiPin) == TRUE, "ASSERT FAILED: SPI MOSI Pin is NOT available on this board. Please check the data sheet.");
-    osg_assert(osg_board_gpio_checkPin(misoPin) == TRUE, "ASSERT FAILED: SPI MISO Pin is NOT available on this board. Please check the data sheet.");
-    if (ssPinList != NULL)
+    osg_assert(osg_board_Gpio_checkPin(config->sclkPin) == true, "ASSERT FAILED: SPI SCLK Pin is NOT available on this board. Please check the data sheet.");
+    osg_assert(osg_board_Gpio_checkPin(config->mosiPin) == true, "ASSERT FAILED: SPI MOSI Pin is NOT available on this board. Please check the data sheet.");
+    osg_assert(osg_board_Gpio_checkPin(config->misoPin) == true, "ASSERT FAILED: SPI MISO Pin is NOT available on this board. Please check the data sheet.");
+    if (config->ssPinList != NULL)
     {
-        for (Size i = 0; i < ssPinListSize; ++i)
+        for (Size i = 0; i < config->ssPinListSize; ++i)
         {
-            osg_assert(osg_board_gpio_checkPin(ssPinList[i]) == TRUE, "ASSERT FAILED: SPI SS Pin is NOT available on this board. Please check the data sheet.");
+            osg_assert(osg_board_Gpio_checkPin(config->ssPinList[i]) == true, "ASSERT FAILED: SPI SS Pin is NOT available on this board. Please check the data sheet.");
         }
     }
 
-    self->id = id;
-    self->mode = mode;
+    self->id = config->id;
 
-    osg_Gpio_ctor(&self->sclkPin, sclkPin, OSG_GPIO_MODE_AF_PP, OSG_GPIO_PULLDOWN, OSG_GPIO_SPEED_FREQ_VERY_HIGH, _osg_board_spi_getGpioAlternateFunction(id));
-    osg_Gpio_ctor(&self->mosiPin, mosiPin, OSG_GPIO_MODE_AF_PP, OSG_GPIO_PULLDOWN, OSG_GPIO_SPEED_FREQ_VERY_HIGH, _osg_board_spi_getGpioAlternateFunction(id));
-    osg_Gpio_ctor(&self->misoPin, misoPin, OSG_GPIO_MODE_AF_PP, OSG_GPIO_PULLDOWN, OSG_GPIO_SPEED_FREQ_VERY_HIGH, _osg_board_spi_getGpioAlternateFunction(id));
-    self->ssPinList = ssPinList;
-    self->ssPinListSize = ssPinListSize;
+    osg_GpioConfig gpioConfig;
+    memset(&gpioConfig, 0, sizeof(gpioConfig));
+    
+    gpioConfig.id = config->sclkPin;
+    gpioConfig.mode = OSG_GPIO_MODE_AF_PP;
+    gpioConfig.pull = OSG_GPIO_NOPULL;
+    gpioConfig.speed = OSG_GPIO_SPEED_FREQ_VERY_HIGH;
+    gpioConfig.alternate = config->alternateFunction;
+    osg_Gpio_ctor(&self->sclkPin, &gpioConfig);
+    gpioConfig.id = config->mosiPin;
+    osg_Gpio_ctor(&self->mosiPin, &gpioConfig);
+    gpioConfig.id = config->misoPin;
+    osg_Gpio_ctor(&self->misoPin, &gpioConfig);
+    
+    self->ssPinList = config->ssPinList;
+    self->ssPinListSize = config->ssPinListSize;
 
-    if (circularRxBuffer != NULL && rxBufferSize > 0)
-        osg_CircularFifo_ctor(&self->rxBuffer, circularRxBuffer, rxBufferSize, OSG_FIFO_OVERWRITE_NO_ERROR);
-
-    if (circularTxBuffer != NULL && txBufferSize > 0)
-        osg_CircularFifo_ctor(&self->txBuffer, circularTxBuffer, txBufferSize, OSG_FIFO_ERROR);
-
-    osg_board_spi_ctor(self, clockSpeed, polarity, phase, endianess, dataSize, ssMode);
+    osg_board_Spi_ctor(self, config);
 }
 
 void osg_Spi_dtor(osg_Spi * self)
@@ -60,45 +63,78 @@ void osg_Spi_dtor(osg_Spi * self)
     osg_Gpio_dtor(&self->mosiPin);
     osg_Gpio_dtor(&self->misoPin);
 
-    osg_board_spi_dtor(self);
+    osg_board_Spi_dtor(self);
 
-    osg_CircularFifo_dtor(&self->rxBuffer);
-    osg_CircularFifo_dtor(&self->txBuffer);
-
-    self->isConfigured = FALSE;
+    self->ssPinList = NULL;
+    self->ssPinListSize = 0;
 }
 
-Bool osg_Spi_sendBlocking(osg_Spi * self, uint16_t ssPinIndex, void * buffer, Size bufferSize, uint32_t timeout)
+void osg_Spi_setBuffers(osg_Spi * self, void * circularTxBuffer, const Size txBufferSize, void * circularRxBuffer, const Size rxBufferSize)
 {
-    return osg_board_spi_sendBlocking(self, ssPinIndex, buffer, bufferSize, timeout);
+    osg_board_Spi_setBuffers(self, circularTxBuffer, txBufferSize, circularRxBuffer, rxBufferSize);
 }
 
-Bool osg_Spi_receiveBlocking(osg_Spi * self, uint16_t ssPinIndex, void * buffer, Size bufferSize, uint32_t timeout)
+void osg_Spi_setBufferedCallbacks(osg_Spi * self, const osg_SpiCallback tx, const osg_SpiCallback rx)
 {
-    return osg_board_spi_receiveBlocking(self, ssPinIndex, buffer, bufferSize, timeout);
+    osg_board_Spi_setBufferedCallbacks(self, tx, rx);
 }
 
-Bool osg_Spi_sendNonBlocking(osg_Spi * self, uint16_t ssPinIndex, void * buffer, Size bufferSize, osg_SpiCallback callback)
+void osg_Spi_setNbCallbacks(osg_Spi * self, const osg_SpiCallback tx, const osg_SpiCallback rx)
 {
-    return osg_board_spi_sendNonBlocking(self, ssPinIndex, buffer, bufferSize, callback);
+    osg_board_Spi_setNbCallbacks(self, tx, rx);
 }
 
-Bool osg_Spi_receiveNonBlocking(osg_Spi * self, uint16_t ssPinIndex, void * buffer, Size bufferSize, osg_SpiCallback callback)
+bool osg_Spi_sendBlocking(osg_Spi * self, const uint16_t ssPinIndex, void * buffer, const Size bufferSize, const uint32_t timeout)
 {
-    return osg_board_spi_receiveNonBlocking(self, ssPinIndex, buffer, bufferSize, callback);
+    return osg_board_Spi_sendBlocking(self, ssPinIndex, buffer, bufferSize, timeout);
 }
 
-Size osg_Spi_sendBuffered(osg_Spi * self, uint16_t ssPinIndex, void * buffer, Size bufferSize, osg_SpiCallback callback)
+bool osg_Spi_receiveBlocking(osg_Spi * self, const uint16_t ssPinIndex, void * buffer, const Size bufferSize, const uint32_t timeout)
 {
-    return osg_board_spi_sendBuffered(self, ssPinIndex, buffer, bufferSize, callback);
+    return osg_board_Spi_receiveBlocking(self, ssPinIndex, buffer, bufferSize, timeout);
 }
 
-Size osg_Spi_receivedBuffered(osg_Spi * self, uint16_t ssPinIndex, void * buffer, Size bufferSize)
+bool osg_Spi_sendNonBlocking(osg_Spi * self, const uint16_t ssPinIndex, void * buffer, const Size bufferSize)
 {
-    return osg_board_spi_receivedBuffered(self, ssPinIndex, buffer, bufferSize);
+    return osg_board_Spi_sendNonBlocking(self, ssPinIndex, buffer, bufferSize);
 }
 
-Size osg_Spi_getSizeOfReceivedData(osg_Spi * self)
+bool osg_Spi_receiveNonBlocking(osg_Spi * self, const uint16_t ssPinIndex, void * buffer, const Size bufferSize)
 {
-    return osg_board_spi_getSizeOfReceivedData(self);
+    return osg_board_Spi_receiveNonBlocking(self, ssPinIndex, buffer, bufferSize);
+}
+
+bool osg_Spi_sendBuffered(osg_Spi * self, const uint16_t ssPinIndex, const void * buffer, const Size bufferSize)
+{
+    return osg_board_Spi_sendBuffered(self, ssPinIndex, buffer, bufferSize);
+}
+
+Size osg_Spi_receiveBuffered(osg_Spi * self, const uint16_t ssPinIndex, void * buffer, const Size bufferSize)
+{
+    return osg_board_Spi_receiveBuffered(self, ssPinIndex, buffer, bufferSize);
+}
+
+void osg_Spi_startReceiveBuffered(osg_Spi * self, const uint16_t ssPinIndex)
+{
+    osg_board_Spi_startReceiveBuffered(self, ssPinIndex);
+}
+
+void osg_Spi_stopReceiveBuffered(osg_Spi * self)
+{
+    osg_board_Spi_stopReceiveBuffered(self);
+}
+
+bool osg_Spi_isReceiveBufferedEnabled(osg_Spi * self)
+{
+    return osg_board_Spi_isReceiveBufferedEnabled(self);
+}
+
+bool osg_Spi_sendReceiveBlocking(osg_Spi * self, const uint16_t ssPinIndex, void * bufferTx, void * bufferRx, const Size transferSize, const uint32_t timeout)
+{
+    return osg_board_Spi_sendReceiveBlocking(self, ssPinIndex, bufferTx, bufferRx, transferSize, timeout);
+}
+
+uint8_t osg_Spi_countSpis()
+{
+    return osg_board_Spi_countSpis();
 }

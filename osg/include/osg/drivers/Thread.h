@@ -34,51 +34,67 @@ extern "C" {
 /// @ingroup Thread
 /// @memberof osg_Thread
 /// @param self The thread object.
-/// @param function The function to call.
-/// @param argument Argument passed to function.
-/// @param attributes Thread's attributes (NULL: default values).
-void osg_Thread_ctor(osg_Thread * self, osg_ThreadFunction function, void * argument, void * attributes);
+/// @param config The thread configuration.
+void osg_Thread_ctor(osg_Thread * self, const osg_ThreadConfig * const config);
+
 /// @brief Destructor.
 /// @ingroup Thread
 /// @memberof osg_Thread
 /// @param self The thread object.
 void osg_Thread_dtor(osg_Thread * self);
+
 /// @brief Start the thread.
 /// @ingroup Thread
 /// @memberof osg_Thread
 /// @param self The thread object.
-/// @return TRUE if the thread correctly started.
-Bool osg_Thread_resume(osg_Thread * self);
+/// @return true if the thread correctly started.
+bool osg_Thread_resume(osg_Thread * self);
+
 /// @brief Stop the thread.
 /// @ingroup Thread
 /// @memberof osg_Thread
 /// @param self The thread object.
-/// @return TRUE if the thread correctly stopped.
-Bool osg_Thread_pause(osg_Thread * self);
+/// @return true if the thread correctly stopped.
+bool osg_Thread_pause(osg_Thread * self);
+
+/// @brief Stop the thread.
+/// @ingroup Thread
+/// @memberof osg_Thread
+/// @param id The thread id.
+/// @return true if the thread correctly stopped.
+bool osg_Thread_suspend(void * id);
+
 /// @brief Check if a thread is running.
 /// @ingroup Thread
 /// @memberof osg_Thread
 /// @param self The thread object.
-/// @return TRUE if the thread is running.
-Bool osg_Thread_isRunning(osg_Thread * self);
+/// @return true if the thread is running.
+bool osg_Thread_isRunning(osg_Thread * self);
+
 /// @brief Check if a thread is running.
 /// @ingroup Thread
 /// @memberof osg_Thread
 /// @param self The thread object.
 /// @return The thread state.
 osg_ThreadState osg_Thread_getState(osg_Thread * self);
+
 /// @brief Sets the thread in detached mode.
 /// @ingroup Thread
 /// @memberof osg_Thread
 /// @param self The thread object.
-/// @return TRUE on success.
-Bool osg_Thread_detach(osg_Thread * self);
-/// @brief Returns the thread low level handler.
+/// @return true on success.
+bool osg_Thread_detach(osg_Thread * self);
+
+/// @brief Returns the thread id.
 /// @ingroup Thread
 /// @memberof osg_Thread
-/// @param self The thread object.
-/// @return The low level handler.
-void * osg_Thread_getHandler(osg_Thread * self);
+/// @return The low level id.
+void * osg_Thread_getThreadId(void);
+
+/// @brief Pass control to next thread that is in state READY.
+/// @ingroup Thread
+/// @memberof osg_Thread
+void osg_Thread_yieldNextThread(void);
 
 #ifdef __cplusplus
 }

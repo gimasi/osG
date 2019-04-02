@@ -19,6 +19,12 @@
 #ifndef OSG_RTOS_H
 #define OSG_RTOS_H
 
+#ifdef OSG_HAS_CONFIG_FILE
+#include <osgConfig.h>
+#else
+#include "../../templates/osgConfig.h"
+#endif
+
 /// @defgroup RTOS RTOS
 /// The internal API for RTOS support
 
@@ -31,5 +37,16 @@
 /// @ingroup RTOS
 /// Hardware driver classes
 #include "rtos/rtos-drivers.h"
+
+// Select the correct rtos
+#if defined OSG_OS_NAME && OSG_OS_NAME == OSG_OS_CMSIS_RTOS2
+    // RTOS2
+    #include "../rtos2/include/rtos/rtos-config.h"
+    #if OSG_OS_USE_MUTEX == 1
+        #include "../../rtos/rtos2/src/drivers/rtos-MutexSupport.h"
+    #endif
+#else
+    #error "INVALID BOARD FAMILY. Check the 'osgConfig.h' file."
+#endif
 
 #endif

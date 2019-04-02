@@ -21,10 +21,23 @@
 
 #include "GpioDataTypes.h"
 #include "TimerDataTypes.h"
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+enum osg_LedFlags;
+typedef enum osg_LedFlags osg_LedFlags;
+/// @brief The Led flags.
+/// @ingroup Led
+/// @memberof osg_Led
+enum osg_LedFlags
+{
+    OSG_LED_FLAG_DEFAULT          = 0x00,
+    OSG_LED_FLAG_BLINKING_ENABLED = 0x02,
+    OSG_LED_FLAG_TIMER_CREATED    = 0x04
+};
 
 struct osg_Led;
 typedef struct osg_Led osg_Led;
@@ -34,12 +47,23 @@ typedef struct osg_Led osg_Led;
 /// @memberof osg_Led
 struct osg_Led
 {
-    /// @brief  The wrapped GPIO
+    /// @brief  The wrapped GPIO.
     /// @private
     osg_Gpio gpio;
-    /// @brief Internal timer
+    /// @brief Internal timer.
     /// @private
-    osg_Timer timer;
+    osg_Timer timer;    /// @brief Blinking Period expressed in milliseconds.
+    /// @private
+    uint32_t millis;
+    /// @brief How many times the Led has to blink. Set 0 for "infinite".
+    /// @private
+    uint32_t totalNumberOfBlinks;
+    /// @brief This field is valid only if @p totalNumberOfBlinks > 0. Count down of blinking times. When it reaches 0, then the Led stop blinking.
+    /// @private
+    uint32_t remainingNumberOfBlinks;
+    /// @brief Led flags
+    /// @private
+    osg_LedFlags flags;
 };
 
 enum osg_LedId;
@@ -58,6 +82,21 @@ enum osg_LedId
     OSG_LED_RED,
     OSG_LED_ORANGE,
     OSG_LED_BLUE
+};
+
+struct osg_LedConfig;
+typedef struct osg_LedConfig osg_LedConfig;
+/// @brief The configuration for a led.
+/// @ingroup Led
+/// @memberof osg_Led
+struct osg_LedConfig
+{
+    /// @brief The led ID.
+    /// Considered only if gpioId is unset (holds OSG_GPIO_NONE)
+    osg_LedId ledId;
+    /// @brief The Gpio ID for the led.
+    /// If set to OSG_GPIO_NONE, the ledId is used.
+    osg_GpioId gpioId;
 };
 
 #ifdef __cplusplus

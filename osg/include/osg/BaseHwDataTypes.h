@@ -19,6 +19,8 @@
 #ifndef OSG_BASEHWDATATYPES_H
 #define OSG_BASEHWDATATYPES_H
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -26,6 +28,16 @@ extern "C" {
 /// @brief The user application type.
 /// @ingroup Base
 typedef void (*osg_BaseHwApplication)(void);
+
+struct osg_BaseHwConfig;
+typedef struct osg_BaseHwConfig osg_BaseHwConfig;
+/// @brief The user main thread configuration.
+/// @ingroup Base
+struct osg_BaseHwConfig
+{
+    const char * name;
+    const uint32_t stackSize;
+};
 
 #ifdef __cplusplus
 }

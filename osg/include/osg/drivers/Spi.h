@@ -34,46 +34,43 @@ extern "C" {
 /// @ingroup SPI
 /// @memberof osg_Spi
 /// @param self The SPI object.
-/// @param id The SPI id.
-/// @param mode The device mode (master/slave).
-/// @param clockSpeed The SPI *master* bus speed.
-/// @param polarity The SPI polarity configuration.
-/// @param phase The SPI phase configuration.
-/// @param endianess The SPI data transfer order.
-/// @param dataSize The SPI data size.
-/// @param ssMode Specify the slave select PIN functionality mode.
-/// @param sclkPin Board PIN used for SCLK port.
-/// @param mosiPin Board PIN used for MOSI port.
-/// @param misoPin Board PIN used for MISO port.
-/// @param ssPinList Array of board PINs used as salve select (SS). In *slave* mode it can contain 1 PIN at most. In *master* mode it should contain 1 PIN for each slave.
-/// @param ssPinListSize The number of PINs used as slave select (SS).
-/// @param circularTxBuffer Pointer to a buffer used as Circular Buffer for continuos transmission.
-/// @param txBufferSize The size of the buffer used for transmissions.
-/// @param circularRxBuffer Pointer to a buffer used as Circular Buffer for continuos reception.
-/// @param rxBufferSize The size of the buffer used for reception.
-void osg_Spi_ctor(osg_Spi * self,
-                  osg_SpiId id,
-                  osg_SpiMode mode,
-                  uint32_t clockSpeed,
-                  osg_SpiPolarity polarity,
-                  osg_SpiPhase phase,
-                  osg_SpiEndianess endianess,
-                  osg_SpiDataSize dataSize,
-                  osg_SpiSlaveSelectMode ssMode,
-                  osg_GpioId sclkPin,
-                  osg_GpioId mosiPin,
-                  osg_GpioId misoPin,
-                  osg_GpioId * ssPinList,
-                  Size ssPinListSize,
-                  void * circularTxBuffer,
-                  Size txBufferSize,
-                  void * circularRxBuffer,
-                  Size rxBufferSize);
+/// @param config The SPI configuration.
+void osg_Spi_ctor(
+    osg_Spi * self,
+    const osg_SpiConfig * const config
+    );
+
 /// @brief Destructor.
 /// @ingroup SPI
 /// @memberof osg_Spi
 /// @param self The SPI object.
 void osg_Spi_dtor(osg_Spi * self);
+
+/// @brief Registers the buffers used in buffered functions.
+/// @ingroup SPI
+/// @memberof osg_Spi
+/// @param self The SPI object.
+/// @param circularTxBuffer Pointer to a buffer used as Circular Buffer for continuos transmission.
+/// @param txBufferSize The size of the buffer used for transmissions.
+/// @param circularRxBuffer Pointer to a buffer used as Circular Buffer for continuos reception.
+/// @param rxBufferSize The size of the buffer used for reception.
+void osg_Spi_setBuffers(osg_Spi * self, void * circularTxBuffer, const Size txBufferSize, void * circularRxBuffer, const Size rxBufferSize);
+
+/// @brief Registers the callbacks to call in buffered mode.
+/// @ingroup SPI
+/// @memberof osg_Spi
+/// @param self The SPI object.
+/// @param tx The callback for successful transmission communication.
+/// @param rx The callback for successful reception communication.
+void osg_Spi_setBufferedCallbacks(osg_Spi * self, const osg_SpiCallback tx, const osg_SpiCallback rx);
+
+/// @brief Registers the callbacks to call after a non-blocking communication.
+/// @ingroup SPI
+/// @memberof osg_Spi
+/// @param self The SPI object.
+/// @param tx The callback for successful transmission communication.
+/// @param rx The callback for successful reception communication.
+void osg_Spi_setNbCallbacks(osg_Spi * self, const osg_SpiCallback tx, const osg_SpiCallback rx);
 
 /// @brief Use this method to send an amount of data through SPI in blocking mode.
 /// @ingroup SPI
@@ -83,8 +80,9 @@ void osg_Spi_dtor(osg_Spi * self);
 /// @param buffer The pointer to a valid buffer contains the data to send.
 /// @param bufferSize The size of the buffer.
 /// @param timeout After this timeout (in millisec) the transmission is aborted.
-/// @return TRUE if the transmission complete successfully.
-Bool osg_Spi_sendBlocking(osg_Spi * self, uint16_t ssPinIndex, void * buffer, Size bufferSize, uint32_t timeout);
+/// @return true if the transmission complete successfully.
+bool osg_Spi_sendBlocking(osg_Spi * self, const uint16_t ssPinIndex, void * buffer, const Size bufferSize, const uint32_t timeout);
+
 /// @brief Use this method to receive an amount of data through SPI in blocking mode.
 /// @ingroup SPI
 /// @memberof osg_Spi
@@ -93,8 +91,9 @@ Bool osg_Spi_sendBlocking(osg_Spi * self, uint16_t ssPinIndex, void * buffer, Si
 /// @param buffer The pointer to a valid buffer contains the data received.
 /// @param bufferSize The size of the buffer.
 /// @param timeout After this timeout (in millisec) the transmission is aborted.
-/// @return TRUE if the transmission complete successfully.
-Bool osg_Spi_receiveBlocking(osg_Spi * self, uint16_t ssPinIndex, void * buffer, Size bufferSize, uint32_t timeout);
+/// @return true if the transmission complete successfully.
+bool osg_Spi_receiveBlocking(osg_Spi * self, const uint16_t ssPinIndex, void * buffer, const Size bufferSize, const uint32_t timeout);
+
 /// @brief Use this method to send an amount of data through SPI in NON-blocking mode.
 /// @ingroup SPI
 /// @memberof osg_Spi
@@ -102,9 +101,9 @@ Bool osg_Spi_receiveBlocking(osg_Spi * self, uint16_t ssPinIndex, void * buffer,
 /// @param ssPinIndex The index of the ssPinList used in *master* mode for activates the correct slave.
 /// @param buffer The pointer to a valid buffer contains the data to send.
 /// @param bufferSize The size of the buffer.
-/// @param callback The function called after the trasmission is completed.
-/// @return TRUE if the transmission is successfully handled.
-Bool osg_Spi_sendNonBlocking(osg_Spi * self, uint16_t ssPinIndex, void * buffer, Size bufferSize, osg_SpiCallback callback);
+/// @return true if the transmission is successfully handled.
+bool osg_Spi_sendNonBlocking(osg_Spi * self, const uint16_t ssPinIndex, void * buffer, const Size bufferSize);
+
 /// @brief Use this method to receive an amount of data through SPI in NON-blocking mode.
 /// @ingroup SPI
 /// @memberof osg_Spi
@@ -112,9 +111,9 @@ Bool osg_Spi_sendNonBlocking(osg_Spi * self, uint16_t ssPinIndex, void * buffer,
 /// @param ssPinIndex The index of the ssPinList used in *master* mode for activates the correct slave.
 /// @param buffer The pointer to a valid buffer contains the data received.
 /// @param bufferSize The size of the buffer.
-/// @param callback The function called after the trasmission is completed.
-/// @return TRUE if the transmission is successfully handled.
-Bool osg_Spi_receiveNonBlocking(osg_Spi * self, uint16_t ssPinIndex, void * buffer, Size bufferSize, osg_SpiCallback callback);
+/// @return true if the transmission is successfully handled.
+bool osg_Spi_receiveNonBlocking(osg_Spi * self, const uint16_t ssPinIndex, void * buffer, const Size bufferSize);
+
 /// @brief Use this method to send an amount of data through SPI in buffered mode.
 /// @ingroup SPI
 /// @memberof osg_Spi
@@ -122,9 +121,9 @@ Bool osg_Spi_receiveNonBlocking(osg_Spi * self, uint16_t ssPinIndex, void * buff
 /// @param ssPinIndex The index of the ssPinList used in *master* mode for activates the correct slave.
 /// @param buffer The pointer to a valid buffer contains the data to send.
 /// @param bufferSize The size of the buffer.
-/// @param callback The function called after the trasmission is completed.
 /// @return The number of inserted bytes.
-Size osg_Spi_sendBuffered(osg_Spi * self, uint16_t ssPinIndex, void * buffer, Size bufferSize, osg_SpiCallback callback);
+bool osg_Spi_sendBuffered(osg_Spi * self, const uint16_t ssPinIndex, const void * buffer, const Size bufferSize);
+
 /// @brief Use this method to receive an amount of data through SPI in buffered mode.
 /// @ingroup SPI
 /// @memberof osg_Spi
@@ -133,13 +132,45 @@ Size osg_Spi_sendBuffered(osg_Spi * self, uint16_t ssPinIndex, void * buffer, Si
 /// @param buffer The pointer to a valid buffer contains the data received.
 /// @param bufferSize The size of the buffer.
 /// @return The amount of data received and wrote in the buffer; it can be less than the bufferSize.
-Size osg_Spi_receivedBuffered(osg_Spi * self, uint16_t ssPinIndex, void * buffer, Size bufferSize);
-/// @brief Use this method to check if there are some unread data in the circular Rx buffer.
+Size osg_Spi_receiveBuffered(osg_Spi * self, const uint16_t ssPinIndex, void * buffer, const Size bufferSize);
+
+/// @brief Use this method to start storing data in buffer.
 /// @ingroup SPI
 /// @memberof osg_Spi
 /// @param self The SPI object.
-/// @return The amount of data received and not already read.
-Size osg_Spi_getSizeOfReceivedData(osg_Spi * self);
+/// @param ssPinIndex The index of the ssPinList used in *master* mode for activates the correct slave.
+void osg_Spi_startReceiveBuffered(osg_Spi * self, const uint16_t ssPinIndex);
+
+/// @brief Use this method to stop storing data in buffer.
+/// @ingroup SPI
+/// @memberof osg_Spi
+/// @param self The SPI object.
+void osg_Spi_stopReceiveBuffered(osg_Spi * self);
+
+/// @brief Use this method to know whether the buffer is enabled.
+/// @ingroup SPI
+/// @memberof osg_Spi
+/// @param self The SPI object.
+/// @return true if the buffer is enabled.
+bool osg_Spi_isReceiveBufferedEnabled(osg_Spi * self);
+
+/// @brief Gets the number of SPI peripherals.
+/// @ingroup SPI
+/// @memberof osg_Spi
+/// @return Number of SPIs peripheral on this board.
+uint8_t osg_Spi_countSpis(void);
+
+/// @brief Use this method to send and receive an amount of data through SPI in blocking mode.
+/// @ingroup SPI
+/// @memberof osg_Spi
+/// @param self The SPI object.
+/// @param ssPinIndex The index of the ssPinList used in *master* mode for activates the correct slave.
+/// @param bufferTx The pointer to a valid buffer contains the data to send.
+/// @param bufferRx The pointer to a valid buffer contains the data received.
+/// @param transferSize The size of the buffers.
+/// @param timeout After this timeout (in millisec) the transmission is aborted.
+/// @return true if the transmission complete successfully.
+bool osg_Spi_sendReceiveBlocking(osg_Spi * self, const uint16_t ssPinIndex, void * bufferTx, void * bufferRx, const Size transferSize, const uint32_t timeout);
 
 #ifdef __cplusplus
 }

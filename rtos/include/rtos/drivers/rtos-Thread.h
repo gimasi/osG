@@ -32,34 +32,52 @@ extern "C" {
 /// @brief Constructor for thread.
 /// @ingroup RTOS-Thread
 /// @param self The thread object.
-/// @param function The function to call.
-/// @param argument Argument passed to function.
-/// @param attributes Thread's attributes (NULL: default values).
-void osg_rtos_Thread_ctor(osg_Thread * self, osg_ThreadFunction function, void * argument, void * attributes);
+/// @param config The config.
+void osg_rtos_Thread_ctor(osg_Thread * self, const osg_ThreadConfig * const config);
+
 /// @brief Destructor.
 /// @ingroup RTOS-Thread
 /// @param self The thread object.
 void osg_rtos_Thread_dtor(osg_Thread * self);
+
 /// @brief Start the thread.
 /// @ingroup RTOS-Thread
 /// @param self The thread object.
-/// @return TRUE if the thread correctly started.
-Bool osg_rtos_Thread_resume(osg_Thread * self);
+/// @return true if the thread correctly started.
+bool osg_rtos_Thread_resume(osg_Thread * self);
+
 /// @brief Stop the thread.
 /// @ingroup RTOS-Thread
-/// @param self The threa object.
-/// @return TRUE if the thread correctly stopped.
-Bool osg_rtos_Thread_pause(osg_Thread * self);
+/// @param self The thread object.
+/// @return true if the thread correctly stopped.
+bool osg_rtos_Thread_pause(osg_Thread * self);
+
+/// @brief Stop the thread.
+/// @ingroup RTOS-Thread
+/// @param id The thread id.
+/// @return true if the thread correctly stopped.
+bool osg_rtos_Thread_suspend(void * id);
+
 /// @brief Check if a thread is running.
 /// @ingroup RTOS-Thread
 /// @param self The thread object.
 /// @return The thread state.
 osg_ThreadState osg_rtos_Thread_getState(osg_Thread * self);
+
 /// @brief Sets the thread in detached mode.
 /// @ingroup RTOS-Thread
 /// @param self The thread object.
-/// @return TRUE on success.
-Bool osg_rtos_Thread_detach(osg_Thread * self);
+/// @return true on success.
+bool osg_rtos_Thread_detach(osg_Thread * self);
+
+/// @brief Returns the thread id.
+/// @ingroup RTOS-Thread
+/// @return The low level id.
+void * osg_rtos_Thread_getThreadId(void);
+
+/// @brief Pass control to next thread that is in state READY.
+/// @ingroup RTOS-Thread
+void osg_rtos_Thread_yieldNextThread(void);
 
 #ifdef __cplusplus
 }

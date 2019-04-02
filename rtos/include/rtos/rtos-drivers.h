@@ -19,7 +19,17 @@
 #ifndef OSG_RTOS_DRIVERS_H
 #define OSG_RTOS_DRIVERS_H
 
+#if OSG_OS_USE_MESSAGES == 1
+#include "drivers/rtos-MessageQueue.h"
+#endif
+#if OSG_OS_USE_MUTEX == 1
+#include "drivers/rtos-Mutex.h"
+#endif
+#if OSG_OS_USE_THREAD == 1
 #include "drivers/rtos-Thread.h"
+#endif
+#if OSG_OS_USE_TIMER == 1
 #include "drivers/rtos-Timer.h"
+#endif
 
 #endif

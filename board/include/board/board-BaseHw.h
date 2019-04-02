@@ -33,23 +33,31 @@ extern "C" {
 /// @brief Method to setup system clock.
 /// It is implicitally called, and can be overwritten (it is a weak symbol).
 /// @ingroup Board-Base
-/// @return TRUE on success
-Bool osg_board_baseHw_systemClockConfig(void);
+/// @return true on success
+bool osg_board_baseHw_systemClockConfig(void);
+
 /// @brief Performs base HW initialization and starts the application.
 /// Implicitally calls osg_board_baseHw_systemClockConfig()
 /// @ingroup Board-Base
 /// @param application The user application to run.
-/// @return TRUE on success.
-Bool osg_board_baseHw_start(osg_BaseHwApplication application);
+/// @return true on success.
+bool osg_board_baseHw_start(osg_BaseHwApplication application);
+
 /// @brief Perform a wait.
 /// @ingroup Board-Base
 /// @param millis The milliseconds to wait.
 void osg_board_baseHw_wait(const uint32_t millis);
+
 /// @brief Performs base HW initialization and starts the application.
 /// Implicitally calls osg_board_baseHw_systemClockConfig()
 /// @ingroup Board-Base
-/// @return TRUE on success.
-Bool osg_board_baseHw_init(void);
+/// @return true on success.
+bool osg_board_baseHw_init(void);
+
+/// @brief Gets tick count.
+/// @ingroup Board-Base
+/// @return Tick count.
+uint32_t osg_board_baseHw_getTick(void);
 
 #ifdef __cplusplus
 }

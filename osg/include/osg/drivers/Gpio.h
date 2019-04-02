@@ -39,71 +39,72 @@ typedef void (*osg_GpioInterruptCallback)(const osg_GpioPin);
 /// @ingroup Gpio
 /// @memberof osg_Gpio
 /// @param self The object to initialize
-/// @param id The pin id
-/// @param mode The pin mode
-/// @param pull The pin pull mode
-/// @param speed The pin speed
-/// @param alternate The pin alternate function
+/// @param config The configuration
 void osg_Gpio_ctor(
     osg_Gpio * self,
-    const osg_GpioId id,
-    const osg_GpioMode mode,
-    const osg_GpioPull pull,
-    const osg_GpioSpeed speed,
-    const osg_GpioAlternateFunction alternate
+    const osg_GpioConfig * const config
     );
+
 /// @brief The pin destructor
 /// @ingroup Gpio
 /// @memberof osg_Gpio
 /// @param self The pin object
 void osg_Gpio_dtor(osg_Gpio * self);
+
 /// @brief Maps a GPIO ID to its port.
 /// @ingroup Gpio
 /// @memberof osg_Gpio
 /// @param id The ID.
 /// @return The port.
-osg_GpioPort osg_gpio_getPort(const osg_GpioId id);
+osg_GpioPort osg_Gpio_getPort(const osg_GpioId id);
+
 /// @brief Maps a GPIO ID to its pin.
 /// @ingroup Gpio
 /// @memberof osg_Gpio
 /// @param id The ID.
 /// @return The port.
-osg_GpioPin osg_gpio_getPin(const osg_GpioId id);
+osg_GpioPin osg_Gpio_getPin(const osg_GpioId id);
+
 /// @brief Calculates the GPIO ID from its port and pin.
 /// @ingroup Gpio
 /// @memberof osg_Gpio
 /// @param port The port.
 /// @param pin The pin.
 /// @return The id.
-osg_GpioId osg_gpio_getId(const osg_GpioPort port, const osg_GpioPin pin);
+osg_GpioId osg_Gpio_getId(const osg_GpioPort port, const osg_GpioPin pin);
+
 /// @brief Returns the low level pin handler
 /// @ingroup Gpio
 /// @memberof osg_Gpio
 /// @param self The pin object
 void * osg_Gpio_getHandler(osg_Gpio * self);
+
 /// @brief Reads the pin value
 /// @ingroup Gpio
 /// @memberof osg_Gpio
 /// @param self The pin object
 /// @return The pin value as boolean
-Bool osg_Gpio_read(osg_Gpio * self);
+bool osg_Gpio_read(osg_Gpio * self);
+
 /// @brief Write the pin value
 /// @ingroup Gpio
 /// @memberof osg_Gpio
 /// @param self The pin object
 /// @param value The value to set as boolean
-void osg_Gpio_write(osg_Gpio * self, const Bool value);
+void osg_Gpio_write(osg_Gpio * self, const bool value);
+
 /// @brief Toggles the pin value
 /// @ingroup Gpio
 /// @memberof osg_Gpio
 /// @param self The pin object
 void osg_Gpio_toggle(osg_Gpio * self);
+
 /// @brief Locks the pin.
 /// @ingroup Gpio
 /// @memberof osg_Gpio
 /// @param self The pin object
 /// @return True on success
-Bool osg_Gpio_lock(osg_Gpio * self);
+bool osg_Gpio_lock(osg_Gpio * self);
 
 /// @brief Sets the interrupt callback for EXTI
 /// Note that the callback is set for all the matching pin of all ports.
@@ -122,7 +123,7 @@ Bool osg_Gpio_lock(osg_Gpio * self);
 /// @param callback The callback
 /// @param preemptionPriority The main priority to dispatch the callback
 /// @param subPriority The secondary priority to dispatch the callback
-void osg_gpio_setExtInterruptCallback(
+void osg_Gpio_setExtInterruptCallback(
     const osg_GpioId id,
     osg_GpioInterruptCallback callback,
     const osg_IrqPriority preemptionPriority,

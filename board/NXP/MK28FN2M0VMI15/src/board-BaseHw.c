@@ -18,20 +18,20 @@
 //
 #include "../../../include/board/board-BaseHw.h"
 #include "../../../include/board/drivers/board-Timer.h"
-#include "board-config.h"
-#include <osg.h>
+#include "../include/board/board-config.h"
+#include "../../../../osg/include/osg.h"
 
 #include <fsl_common.h>
 #include <fsl_clock.h>
 #include <fsl_device_registers.h>
 #include <fsl_smc.h>
 
-Bool osg_board_baseHw_start(osg_BaseHwApplication application)
+bool osg_board_baseHw_start(osg_BaseHwApplication application)
 {
-    const Bool initOk = osg_board_baseHw_init();
-    if (initOk != TRUE) return FALSE;
+    const bool initOk = osg_board_baseHw_init();
+    if (initOk != true) return false;
     application();
-    return TRUE;
+    return true;
 }
 
 void osg_board_baseHw_wait(const uint32_t millis)
@@ -55,6 +55,11 @@ void osg_board_baseHw_wait(const uint32_t millis)
     LPTMR0->CSR = 0;                     /* Turn off timer */
 
     SIM->SCGC5 &= ~SIM_SCGC5_LPTMR0_MASK; /* Disabled clock to save power */
+}
+
+uint32_t osg_board_baseHw_getTick()
+{
+    return 0;
 }
 
 #if 0
@@ -192,7 +197,7 @@ const osc_config_t oscConfig_BOARD_BootClockRUN =
             }
     };
 
-__weak Bool osg_board_baseHw_systemClockConfig(void)
+__weak bool osg_board_baseHw_systemClockConfig(void)
 {
     /* Set the system clock dividers in SIM to safe value. */
     CLOCK_SetSimSafeDivs();
@@ -214,14 +219,14 @@ __weak Bool osg_board_baseHw_systemClockConfig(void)
     /* Set SystemCoreClock variable. */
     SystemCoreClock = BOARD_BOOTCLOCKRUN_CORE_CLOCK;
 
-    return TRUE;
+    return true;
 }
 
-Bool osg_board_baseHw_init(void)
+bool osg_board_baseHw_init(void)
 {
-    const Bool initOk = osg_board_baseHw_systemClockConfig();
-    if (initOk == TRUE) return TRUE;
-    return FALSE;
+    const bool initOk = osg_board_baseHw_systemClockConfig();
+    if (initOk == true) return true;
+    return false;
 }
 
 // useful?

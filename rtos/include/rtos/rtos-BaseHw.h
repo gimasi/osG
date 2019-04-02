@@ -33,13 +33,25 @@ extern "C" {
 /// @brief Performs base RTOS initialization and starts the application.
 /// @ingroup RTOS-Base
 /// @param application The user application to run.
-/// @return TRUE on success.
-Bool osg_rtos_baseHw_start(osg_BaseHwApplication application);
+/// @return true on success.
+bool osg_rtos_baseHw_start(osg_BaseHwApplication application);
+
+/// @brief Performs base RTOS initialization and starts the application with custom settings.
+/// @ingroup RTOS-Base
+/// @param application The user application to run.
+/// @param attributes The custom thread attributes to apply.
+/// @return true on success.
+bool osg_rtos_baseHw_startCustom(osg_BaseHwApplication application, const osg_BaseHwConfig * attributes);
 
 /// @brief Perform a wait.
 /// @ingroup RTOS-Base
 /// @param millis The milliseconds to wait.
 void osg_rtos_baseHw_wait(const uint32_t millis);
+
+/// @brief Gets tick count.
+/// @ingroup RTOS-Base
+/// @return Tick count.
+uint32_t osg_rtos_baseHw_getTick(void);
 
 #ifdef __cplusplus
 }

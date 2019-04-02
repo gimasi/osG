@@ -19,6 +19,8 @@
 #ifndef OSG_DRIVERS_TIMERDATATYPES_H
 #define OSG_DRIVERS_TIMERDATATYPES_H
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -38,12 +40,26 @@ enum osg_TimerType
     OSG_TIMER_PERIODIC
 };
 
+struct osg_TimerConfig;
+typedef struct osg_TimerConfig osg_TimerConfig;
+/// @brief The timer config.
+/// @ingroup Timer
+/// @memberof osg_Timer
+struct osg_TimerConfig
+{
+    /// @brief type The timer type: one shot or periodic.
+    osg_TimerType type;
+    /// @brief callback The callback to call.
+    osg_TimerCallback callback;
+    /// @brief argument Argument passed to callback function.
+    void * argument;
+};
+
 struct osg_Timer;
 typedef struct osg_Timer osg_Timer;
 /// @brief The timer class.
 /// @ingroup Timer
 /// @memberof osg_Timer
-/// @brief It is a convenience wrapper.
 struct osg_Timer
 {
     /// @brief Low-level handler

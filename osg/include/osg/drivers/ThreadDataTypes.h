@@ -19,6 +19,8 @@
 #ifndef OSG_DRIVERS_THREADDATATYPES_H
 #define OSG_DRIVERS_THREADDATATYPES_H
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -39,6 +41,37 @@ enum osg_ThreadState
     OSG_THREAD_RESEVED
 };
 
+/// @brief The thread function signature.
+/// @ingroup Thread
+/// @memberof osg_Thread
+typedef void (*osg_ThreadFunction)(void *);
+
+struct osg_ThreadAttributes;
+typedef struct osg_ThreadAttributes osg_ThreadAttributes;
+/// @brief The thread attributes.
+/// @ingroup Thread
+/// @memberof osg_Thread
+struct osg_ThreadAttributes
+{
+    char * name;
+    uint32_t stackSize;
+};
+
+struct osg_ThreadConfig;
+typedef struct osg_ThreadConfig osg_ThreadConfig;
+/// @brief The thread config.
+/// @ingroup Thread
+/// @memberof osg_Thread
+struct osg_ThreadConfig
+{
+    /// @brief The function to call.
+    osg_ThreadFunction function;
+    /// @brief Argument passed to function.
+    void * argument;
+    /// @brief Thread's attributes.
+    osg_ThreadAttributes attributes;
+};
+
 struct osg_Thread;
 typedef struct osg_Thread osg_Thread;
 /// @brief The thread class.
@@ -50,11 +83,6 @@ struct osg_Thread
     /// @private
     void * handler;
 };
-
-/// @brief The thread function signature.
-/// @ingroup Thread
-/// @memberof osg_Thread
-typedef void (*osg_ThreadFunction)(void *);
 
 #ifdef __cplusplus
 }

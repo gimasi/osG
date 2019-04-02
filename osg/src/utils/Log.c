@@ -16,7 +16,7 @@
 // osG is also available under a commercial license.
 // Please contact GIMASI at info@gimasi.ch for further information.
 //
-#include "osg/utils/Log.h"
+#include "../../include/osg/utils/Log.h"
 #include <stddef.h>
 
 void _osg_error(const char * msg, const char * file, const int line, const char * func)

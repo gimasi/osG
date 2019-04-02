@@ -35,59 +35,109 @@ extern "C" {
 /// @ingroup Led
 /// @memberof osg_Led
 /// @param self The led object.
-/// @param id The led id of the board.
-void osg_Led_ctor(osg_Led * self, const osg_LedId id);
-/// @brief Constructor for custom Led.
-/// @ingroup Led
-/// @memberof osg_Led
-/// @param self The led object.
-/// @param id The Gpio id connected to external Led.
-void osg_Led_customCtor(osg_Led * self, const osg_GpioId id);
+/// @param config The led configuration.
+void osg_Led_ctor(osg_Led * self, const osg_LedConfig * const config);
+
 /// @brief Destructor.
 /// @ingroup Led
 /// @memberof osg_Led
 /// @param self The led object.
 void osg_Led_dtor(osg_Led * self);
+
 /// @brief Turns the led on.
 /// @ingroup Led
 /// @memberof osg_Led
 /// @param self The led object.
 void osg_Led_turnOn(osg_Led * self);
+
 /// @brief Turns the led off.
 /// @ingroup Led
 /// @memberof osg_Led
 /// @param self The led object.
 void osg_Led_turnOff(osg_Led * self);
+
+/// @brief Gets the led status.
+/// @ingroup Led
+/// @memberof osg_Led
+/// @param self The led object.
+/// @return true if the Led is ON.
+bool osg_Led_isOn(osg_Led * self);
+
 /// @brief Toggles the led status.
 /// @ingroup Led
 /// @memberof osg_Led
 /// @param self The led object.
 void osg_Led_toggle(osg_Led * self);
-/// @brief Start blinking the led forever.
+
+/// @brief Set the blinking period of the Led after call the start/toggle function. Default value is 500ms.
 /// @ingroup Led
 /// @memberof osg_Led
 /// @param self The led object.
-/// @param millis The frequency in milliseconds.
-/// @return True on success
-Bool osg_Led_startBlinking(osg_Led * self, uint32_t millis);
-/// @brief Stop blinking the led.
+/// @param millis The blinking period expressed in milliseconds. Default is 500.
+void osg_Led_setBlinkingPeriod(osg_Led * self, uint32_t millis);
+
+/// @brief Set the number of Led blinks. When the count down reachs 0, then the led stop blinking; only the ON status is take into account. Default value is 0 = forever.
+/// @ingroup Led
+/// @memberof osg_Led
+/// @param self The led object.
+/// @param numberOfBlinks The number of blinks. Default value is 0 (forever).
+void osg_Led_setNumberOfBlinks(osg_Led * self, uint32_t numberOfBlinks);
+
+/// @brief Get the blinking period.
+/// @ingroup Led
+/// @memberof osg_Led
+/// @param self The led object.
+/// @return The blinking period in milliseconds.
+uint32_t osg_Led_getBlinkingPeriod(osg_Led * self);
+
+/// @brief Get the total number of blinks.
+/// @ingroup Led
+/// @memberof osg_Led
+/// @param self The led object.
+/// @return The total number of blinks.
+uint32_t osg_Led_getNumberOfBlinks(osg_Led * self);
+
+/// @brief Toggles the blinking led status.
 /// @ingroup Led
 /// @memberof osg_Led
 /// @param self The led object.
 /// @return True on success
-Bool osg_Led_stopBlinking(osg_Led * self);
+bool osg_Led_toggleBlinking(osg_Led * self);
+
+/// @brief Start blinking the Led with the last (or default) period and number of blinks set.
+/// @ingroup Led
+/// @memberof osg_Led
+/// @param self The led object.
+/// @return True on success
+bool osg_Led_startBlinking(osg_Led * self);
+
+/// @brief Stop blinking the led. It deos not affect the period and number of blinks.
+/// @ingroup Led
+/// @memberof osg_Led
+/// @param self The led object.
+/// @return True on success
+bool osg_Led_stopBlinking(osg_Led * self);
+
+/// @brief Get the Led blinking status.
+/// @ingroup Led
+/// @memberof osg_Led
+/// @param self The led object.
+/// @return true if the led is blinking.
+bool osg_Led_isBlinking(osg_Led * self);
+
 /// @brief Gets the wrapped GPIO object.
 /// @ingroup Led
 /// @memberof osg_Led
 /// @param self The led object.
 /// @return The GPIO internal object
 osg_Gpio * osg_Led_toGpio(osg_Led * self);
+
 /// @brief Maps the led id to the matching GPIO id.
 /// @ingroup Led
 /// @memberof osg_Led
 /// @param id The led id.
 /// @return The GPIO id.
-osg_GpioId osg_led_getGpioId(const osg_LedId id);
+osg_GpioId osg_Led_getGpioId(const osg_LedId id);
 
 #ifdef __cplusplus
 }

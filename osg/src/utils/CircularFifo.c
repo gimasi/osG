@@ -16,57 +16,50 @@
 // osG is also available under a commercial license.
 // Please contact GIMASI at info@gimasi.ch for further information.
 //
-#include "osg/utils/CircularFifo.h"
+#include "../../include/osg/utils/CircularFifo.h"
 
-#define INC(var) (((var) + 1) % self->size)
+#define INC(var) (((var) + 1) % self->config.size)
 #define SELF_INC(var) ((var) = INC(var))
-#define ADD(var,pos) ((var) + (pos)) % self->size)
+#define ADD(var,pos) ((var) + (pos)) % self->config.size)
 
 void osg_CircularFifo_ctor(osg_CircularFifo * self,
-                           void * buffer,
-                           const Size size,
-                           const osg_CircularFifoBehavior behavior)
+                           const osg_CircularFifoConfig * const config)
 {
-    self->buffer = buffer;
-    self->size = size;
+    self->config = *config;
     self->readPosition = 0;
     self->writePosition = 0;
-    self->behavior = behavior;
     self->currentSize = 0;
 
-    if (size == 0 || buffer == NULL)
+    if (config->size == 0 || config->buffer == NULL)
     {
-        self->buffer = NULL;
-        self->size = 0;
+        self->config.buffer = NULL;
+        self->config.size = 0;
     }
 }
 
 void osg_CircularFifo_dtor(osg_CircularFifo * self)
 {
-    self->buffer = NULL;
-    self->size = 0;
+    self->config.buffer = NULL;
+    self->config.size = 0;
     self->readPosition = 0;
     self->writePosition = 0;
-    // self->behavior = OSG_FIFO_OVERWRITE;
+    // self->config.behavior = OSG_FIFO_OVERWRITE;
     self->currentSize = 0;
 }
 
-Bool osg_CircularFifo_isEmpty(const osg_CircularFifo * self)
+bool osg_CircularFifo_isEmpty(const osg_CircularFifo * self)
 {
     return osg_bool(self->currentSize == 0);
 }
 
-Bool osg_CircularFifo_isFull(const osg_CircularFifo * self)
+bool osg_CircularFifo_isFull(const osg_CircularFifo * self)
 {
-    return osg_bool(self->currentSize == self->size);
+    return osg_bool(self->currentSize == self->config.size);
 }
 
-Bool osg_CircularFifo_isNull(const osg_CircularFifo * self)
+bool osg_CircularFifo_isNull(const osg_CircularFifo * self)
 {
-    if (self->buffer != NULL)
-        return FALSE;
-
-    return TRUE;
+    return osg_bool(self->config.buffer == NULL);
 }
 
 Size osg_CircularFifo_getSize(const osg_CircularFifo * self)
@@ -76,7 +69,7 @@ Size osg_CircularFifo_getSize(const osg_CircularFifo * self)
 
 Size osg_CircularFifo_getFreeSize(const osg_CircularFifo * self)
 {
-    return self->size - self->currentSize;
+    return self->config.size - self->currentSize;
 }
 
 void osg_CircularFifo_clear(osg_CircularFifo * self)
@@ -86,38 +79,38 @@ void osg_CircularFifo_clear(osg_CircularFifo * self)
     self->currentSize = 0;
 }
 
-Bool osg_CircularFifo_pushByte(osg_CircularFifo * self, const Byte byte)
+bool osg_CircularFifo_pushByte(osg_CircularFifo * self, const Byte byte)
 {
-    const Bool isFull = osg_CircularFifo_isFull(self);
+    const bool isFull = osg_CircularFifo_isFull(self);
     if (isFull)
     {
-        switch (self->behavior)
+        switch (self->config.behavior)
         {
-            case OSG_FIFO_OVERWRITE: if (self->size < 1) return FALSE; break;
+            case OSG_FIFO_OVERWRITE: if (self->config.size < 1) return false; break;
             case OSG_FIFO_OVERWRITE_NO_ERROR: break;
-            case OSG_FIFO_ERROR: return FALSE;
-            case OSG_FIFO_FILL: return FALSE;
+            case OSG_FIFO_ERROR: return false;
+            case OSG_FIFO_FILL: return false;
         }
     }
 
-    self->buffer[self->writePosition] = byte;
+    self->config.buffer[self->writePosition] = byte;
     SELF_INC(self->writePosition);
     if (isFull)
         SELF_INC(self->readPosition);
     else
         self->currentSize += 1;
 
-    return TRUE;
+    return true;
 }
 
-Bool osg_CircularFifo_popByte(osg_CircularFifo * self, Byte * byte)
+bool osg_CircularFifo_popByte(osg_CircularFifo * self, Byte * byte)
 {
-    if (osg_CircularFifo_isEmpty(self)) return FALSE;
+    if (osg_CircularFifo_isEmpty(self)) return false;
 
-    *byte = self->buffer[self->readPosition];
+    *byte = self->config.buffer[self->readPosition];
     self->currentSize -= 1;
     SELF_INC(self->readPosition);
-    return TRUE;
+    return true;
 }
 
 Size osg_CircularFifo_pushBuffer(osg_CircularFifo * self, const void * buffer, const Size size)
@@ -125,20 +118,20 @@ Size osg_CircularFifo_pushBuffer(osg_CircularFifo * self, const void * buffer, c
     if (osg_CircularFifo_isNull(self)) return 0;
     Size bytesToWrite = size;
     const Byte * buf = buffer;
-    const Size freeSlots = self->size - self->currentSize;
-    const Bool isOverwrite = size > freeSlots ? TRUE : FALSE;
+    const Size freeSlots = self->config.size - self->currentSize;
+    const bool isOverwrite = size > freeSlots ? true : false;
     if (isOverwrite)
     {
-        switch (self->behavior)
+        switch (self->config.behavior)
         {
             case OSG_FIFO_OVERWRITE:
-                if (size > self->size) return 0;
+                if (size > self->config.size) return 0;
                 break;
             case OSG_FIFO_OVERWRITE_NO_ERROR:
-                if (size > self->size)
+                if (size > self->config.size)
                 {
-                    bytesToWrite = self->size;
-                    buf = buf + (size - self->size);
+                    bytesToWrite = self->config.size;
+                    buf = buf + (size - self->config.size);
                 }
                 break;
             case OSG_FIFO_ERROR:
@@ -151,14 +144,14 @@ Size osg_CircularFifo_pushBuffer(osg_CircularFifo * self, const void * buffer, c
 
     for (Size i = 0; i < bytesToWrite; ++i)
     {
-        self->buffer[self->writePosition] = buf[i];
+        self->config.buffer[self->writePosition] = buf[i];
         SELF_INC(self->writePosition);
     }
 
     if (isOverwrite)
     {
         self->readPosition = self->writePosition;
-        self->currentSize = self->size;
+        self->currentSize = self->config.size;
     }
     else
     {
@@ -170,13 +163,13 @@ Size osg_CircularFifo_pushBuffer(osg_CircularFifo * self, const void * buffer, c
 
 Size osg_CircularFifo_popBuffer(osg_CircularFifo * self, void * buffer, const Size size)
 {
-    const Bool isFullRead = size >= self->currentSize ? TRUE : FALSE;
+    const bool isFullRead = size >= self->currentSize ? true : false;
     const Size bytesToRead = isFullRead? self->currentSize : size;
     Byte * buf = buffer;
 
     for (Size i = 0; i < bytesToRead; ++i)
     {
-        buf[i] = self->buffer[self->readPosition];
+        buf[i] = self->config.buffer[self->readPosition];
         SELF_INC(self->readPosition);
     }
 
@@ -191,7 +184,7 @@ Size osg_CircularFifo_popBytes(osg_CircularFifo * self, const Size size)
     Byte b = 0;
     for (ret = 0; ret < size; ++ret)
     {
-        const Bool isRead = osg_CircularFifo_popByte(self, &b);
+        const bool isRead = osg_CircularFifo_popByte(self, &b);
         if (!isRead) return ret;
     }
 
@@ -207,13 +200,13 @@ void osg_CircularFifo_getFilledBuffer(osg_CircularFifo * self, void ** buffer, S
         return;
     }
 
-    *buffer = self->buffer + self->readPosition;
+    *buffer = self->config.buffer + self->readPosition;
     if (self->writePosition >= self->readPosition)
     {
         *size = self->writePosition - self->readPosition;
     }
     else
     {
-        *size = self->size - self->readPosition;
+        *size = self->config.size - self->readPosition;
     }
 }

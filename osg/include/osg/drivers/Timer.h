@@ -34,40 +34,44 @@ extern "C" {
 /// @ingroup Timer
 /// @memberof osg_Timer
 /// @param self The timer object.
-/// @param type The timer type: one shot or periodic.
-/// @param callback The callback to call.
-/// @param argument Argument passed to callback function.
-void osg_Timer_ctor(osg_Timer * self, const osg_TimerType type, osg_TimerCallback callback, void * argument);
+/// @param config The configuration.
+void osg_Timer_ctor(osg_Timer * self, const osg_TimerConfig * const config);
+
 /// @brief Destructor.
 /// @ingroup Timer
 /// @memberof osg_Timer
 /// @param self The timer object.
 void osg_Timer_dtor(osg_Timer * self);
+
 /// @brief Start the timer.
 /// @ingroup Timer
 /// @memberof osg_Timer
 /// @param self The timer object.
 /// @param millis Value of the timer in milliseconds.
-/// @return TRUE if the timer correctly started.
-Bool osg_Timer_start(osg_Timer * self, const uint32_t millis);
+/// @return true if the timer correctly started.
+bool osg_Timer_start(osg_Timer * self, const uint32_t millis);
+
 /// @brief Stop the timer.
 /// @ingroup Timer
 /// @memberof osg_Timer
 /// @param self The timer object.
-/// @return TRUE if the timer correctly stopped.
-Bool osg_Timer_stop(osg_Timer * self);
+/// @return true if the timer correctly stopped.
+bool osg_Timer_stop(osg_Timer * self);
+
 /// @brief Check if a timer is running.
 /// @ingroup Timer
 /// @memberof osg_Timer
 /// @param self The timer object.
-/// @return TRUE if the timer is running.
-Bool osg_Timer_isRunning(osg_Timer * self);
+/// @return true if the timer is running.
+bool osg_Timer_isRunning(osg_Timer * self);
+
 /// @brief Returns the internal low level handler.
 /// @ingroup Timer
 /// @memberof osg_Timer
 /// @param self The timer.
 /// @return The internal handler
 void * osg_Timer_getHandler(osg_Timer * self);
+
 /// @brief Returns the timer type.
 /// @ingroup Timer
 /// @memberof osg_Timer

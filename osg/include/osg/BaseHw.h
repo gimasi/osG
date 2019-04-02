@@ -26,17 +26,32 @@
 extern "C" {
 #endif
 
-
+/// @brief Casts the condition result to the bool type
+/// @ingroup Base
+#define osg_bool(cond) ((cond)? true : false)
 
 /// @brief Performs base HW initialization and system clock initialization.
 /// @ingroup Base
 /// @param application The main routine to execute as application main
-/// @return TRUE on success.
-Bool osg_baseHw_start(osg_BaseHwApplication application);
+/// @return true on success.
+bool osg_baseHw_start(osg_BaseHwApplication application);
+
+/// @brief Performs base HW initialization and starts the application with custom settings (useful only if RTOS enabled).
+/// @ingroup Base
+/// @param application The user application to run.
+/// @param attributes The custom thread attributes to apply; ignored if RTOS is disabled.
+/// @return true on success.
+bool osg_baseHw_startCustom(osg_BaseHwApplication application, const osg_BaseHwConfig * attributes);
+
 /// @brief Waits a delay in milliseconds
 /// @ingroup Base
 /// @param millis The time to wait.
 void osg_baseHw_wait(const uint32_t millis);
+
+/// @brief Gets tick count
+/// @ingroup Base
+/// @return Tick count.
+uint32_t osg_baseHw_getTick(void);
 
 #ifdef __cplusplus
 }

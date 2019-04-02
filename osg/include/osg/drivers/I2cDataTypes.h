@@ -71,6 +71,33 @@ enum osg_I2cAddressingMode
 /// @memberof osg_I2c
 typedef void (* osg_I2cCallback)(void);
 
+struct osg_I2cConfig;
+typedef struct osg_I2cConfig osg_I2cConfig;
+/// @brief The I2C config.
+/// @ingroup I2C
+/// @memberof osg_I2c
+struct osg_I2cConfig
+{
+    /// @param id The I2C id.
+    osg_I2cId id;
+    /// @param mode The device mode (master/slave).
+    osg_I2cMode mode;
+    /// @param clockSpeed The *master* bus speed.
+    uint32_t clockSpeed;
+    /// @param addressingMode The I2C *slave* addressing mode.
+    osg_I2cAddressingMode addressingMode;
+    /// @param enableGeneralCall Indicates if the *slave* accepts a General Call.
+    bool enableGeneralCall;
+    /// @param ownAddress I2C *slave* address.
+    uint16_t ownAddress;
+    /// @param sdaPin Board PIN used for I2C SDA port.
+    osg_GpioId sdaPin;
+    /// @param sclPin Board PIN used for I2C SCL port.
+    osg_GpioId sclPin;
+    /// @brief The alternate function
+    uint16_t alternate;
+};
+
 struct osg_I2c;
 typedef struct osg_I2c osg_I2c;
 /// @brief The I2C class.
