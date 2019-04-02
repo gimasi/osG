@@ -49,8 +49,8 @@ bool osg_rtos_baseHw_startCustom(osg_BaseHwApplication application, const osg_Ba
     if (initKerOk != osOK) return false;
     // cast attributes
     const osThreadAttr_t applAttr = {
-        .stack_size = attributes->stackSize,
-        .name = attributes->name
+        .stack_size = attributes->threadAttributes.stackSize,
+        .name = attributes->threadAttributes.name
     };
     // Create application main thread
     void * handler = osThreadNew((osThreadFunc_t)application, NULL, &applAttr);

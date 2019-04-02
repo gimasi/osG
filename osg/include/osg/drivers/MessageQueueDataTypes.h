@@ -25,26 +25,6 @@
 extern "C" {
 #endif
 
-enum osg_MessageQueueAttributes;
-typedef enum osg_MessageQueueAttributes osg_MessageQueueAttributes;
-/// @brief The possible MessageQueue attributes
-/// @ingroup MessageQueue
-/// @memberof osg_MessageQueue
-enum osg_MessageQueueAttributes
-{
-    OSG_MESSAGEQUEUE_NO_ATTRIBUTES      = 0x00,
-};
-
-enum osg_MessageQueueStatus;
-typedef enum osg_MessageQueueStatus osg_MessageQueueStatus;
-/// @brief The possible MessageQueue status
-/// @ingroup MessageQueue
-/// @memberof osg_MessageQueue
-enum osg_MessageQueueStatus
-{
-    OSG_MESSAGEQUEUE_STATUS_UNDEFINED    = 0x00,
-};
-
 struct osg_MessageQueueConfig;
 typedef struct osg_MessageQueueConfig osg_MessageQueueConfig;
 /// @brief The MessageQueue configuration.
@@ -70,7 +50,6 @@ struct osg_MessageQueue
     /// @brief Low-level handler
     /// @private
     void * handler;
-    osg_MessageQueueStatus status;
 };
 
 #ifdef __cplusplus

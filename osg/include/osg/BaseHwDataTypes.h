@@ -20,6 +20,7 @@
 #define OSG_BASEHWDATATYPES_H
 
 #include <stdint.h>
+#include "drivers/ThreadDataTypes.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,12 +32,12 @@ typedef void (*osg_BaseHwApplication)(void);
 
 struct osg_BaseHwConfig;
 typedef struct osg_BaseHwConfig osg_BaseHwConfig;
-/// @brief The user main thread configuration.
+/// @brief The user main configuration settings.
 /// @ingroup Base
 struct osg_BaseHwConfig
 {
-    const char * name;
-    const uint32_t stackSize;
+    /// @brief The attributes for the main application thread in case of RTOS.
+    osg_ThreadAttributes threadAttributes;
 };
 
 #ifdef __cplusplus

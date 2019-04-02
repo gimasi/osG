@@ -53,7 +53,9 @@ typedef struct osg_ThreadAttributes osg_ThreadAttributes;
 /// @memberof osg_Thread
 struct osg_ThreadAttributes
 {
+    /// @brief The thread name.
     char * name;
+    /// @brief The thread max stack size.
     uint32_t stackSize;
 };
 
