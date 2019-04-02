@@ -1,0 +1,27 @@
+digraph "Drivers"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir=LR;
+  Node0 [label="Drivers",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black"];
+  Node6 [label="Mutex",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group__Mutex.html"];
+  Node3 [label="I2C",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group__I2C.html"];
+  Node7 [label="SPI",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group__SPI.html"];
+  Node2 [label="Gpio",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group__Gpio.html"];
+  Node1 [label="OSG",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group__OSG.html"];
+  Node9 [label="Timer",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group__Timer.html"];
+  Node8 [label="Thread",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group__Thread.html"];
+  Node5 [label="MessageQueue",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group__MessageQueue.html"];
+  Node10 [label="UART",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group__UART.html"];
+  Node4 [label="Led",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group__Led.html"];
+  Node1->Node0 [shape=plaintext, dir="back", style="solid"];
+  Node0->Node2 [shape=plaintext, dir="back", style="solid"];
+  Node0->Node3 [shape=plaintext, dir="back", style="solid"];
+  Node0->Node4 [shape=plaintext, dir="back", style="solid"];
+  Node0->Node5 [shape=plaintext, dir="back", style="solid"];
+  Node0->Node6 [shape=plaintext, dir="back", style="solid"];
+  Node0->Node7 [shape=plaintext, dir="back", style="solid"];
+  Node0->Node8 [shape=plaintext, dir="back", style="solid"];
+  Node0->Node9 [shape=plaintext, dir="back", style="solid"];
+  Node0->Node10 [shape=plaintext, dir="back", style="solid"];
+}

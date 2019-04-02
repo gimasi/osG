@@ -1,0 +1,19 @@
+digraph "Board-Drivers"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir=LR;
+  Node0 [label="Board-Drivers",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black"];
+  Node2 [label="Board-Gpio",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group__Board-Gpio.html"];
+  Node4 [label="Board-Led",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group__Board-Led.html"];
+  Node3 [label="Board-I2C",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group__Board-I2C.html"];
+  Node5 [label="Board-SPI",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group__Board-SPI.html"];
+  Node6 [label="Board-Timer",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group__Board-Timer.html"];
+  Node1 [label="Board",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group__Board.html"];
+  Node1->Node0 [shape=plaintext, dir="back", style="solid"];
+  Node0->Node2 [shape=plaintext, dir="back", style="solid"];
+  Node0->Node3 [shape=plaintext, dir="back", style="solid"];
+  Node0->Node4 [shape=plaintext, dir="back", style="solid"];
+  Node0->Node5 [shape=plaintext, dir="back", style="solid"];
+  Node0->Node6 [shape=plaintext, dir="back", style="solid"];
+}
